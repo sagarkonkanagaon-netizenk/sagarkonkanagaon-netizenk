@@ -5,11 +5,11 @@
 ### Hi, I'm Sagar 👋
 
 I build data platforms end to end, from the first byte ingested to the dashboard, API or AI model
-that uses it, and I make them **notice when they break, and fix themselves**.
+that uses it, built to be **reliable, observable and easy to trust**.
 Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-commerce,
 automotive, finance and industrial IoT. Most recently at eBay, migrating 300+ production pipelines.
 
-- 🏭 **[The Data Foundry](https://data-foundry-sand.vercel.app)**: watch a live pipeline run, break it on purpose, and see it heal
+- 🏭 **[The Data Foundry](https://data-foundry-sand.vercel.app)**: watch a live pipeline run, break it on purpose, and see how it recovers
 - 🧪 **[spark-pipeline-labs](https://github.com/sagarkonkanagaon-netizenk/spark-pipeline-labs)**: production patterns (streaming dedup, SCD2, skew salting, idempotent backfills) as tested PySpark + Delta code
 - 📓 **[til](https://github.com/sagarkonkanagaon-netizenk/til)**: short notes on what I learn each week
 
@@ -56,7 +56,7 @@ flowchart LR
 ### 🏛️ Architecture principles
 
 - **Replayable by design**: raw data is kept, every step can be re-run, every write is idempotent
-- **Fail loudly, heal quietly**: bad data is stopped at the edge, and known failures repair themselves
+- **Fail loudly**: bad data is stopped at the edge and alerted on, never silently passed downstream
 - **Batch and streaming, one model**: the same logic serves both, so numbers agree
 - **Built for the next reader**: documented tables, clear ownership, lineage you can follow
 
@@ -71,7 +71,7 @@ flowchart LR
 
 - **LLM apps on real data:** The Data Foundry's "Ask the Engine" chat answers questions with retrieval (BM25) over curated content
 - **AI-ready data:** clean, documented tables that feed ML features and RAG instead of a pile of CSVs
-- **AI for operations:** pipelines that detect drift and anomalies and repair themselves
+- **AI for operations:** anomaly and drift detection that flags problems early, so engineers fix them fast
 
 ### 🧰 Toolbox
 
