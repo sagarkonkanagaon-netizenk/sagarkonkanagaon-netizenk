@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="header.svg" alt="Sagar Konkanagaon: a self-healing end-to-end data platform, from ingestion to AI" width="100%"/>
+  <img src="header.svg" alt="Sagar Konkanagaon: an animated end-to-end data platform that detects schema drift and heals itself" width="100%"/>
 </p>
 
 ### Hi, I'm Sagar 👋
