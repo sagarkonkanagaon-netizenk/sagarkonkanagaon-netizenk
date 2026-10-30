@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="header.svg" alt="Sagar Konkanagaon, Senior Data Engineer: the data stack orbiting a glowing core above a neon grid" width="100%"/>
+  <img src="banner.webp" alt="Sagar Konkanagaon, Senior Data Engineer: a cinematic 3D flight through a neon data city" width="100%"/>
 </p>
 
 ### Hi, I'm Sagar 👋
