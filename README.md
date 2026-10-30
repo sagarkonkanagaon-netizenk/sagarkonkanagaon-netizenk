@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="banner.webp" alt="Sagar Konkanagaon, Senior Data Engineer: a cinematic 3D flight through a neon data city" width="100%"/>
+  <img src="banner.webp" alt="Animated 3D banner: a masked data hero grabs messy raw data off a conveyor, zaps a corrupt record, cleans the rest and throws it downstream to BI, ML and APIs" width="100%"/>
 </p>
 
 ### Hi, I'm Sagar 👋
