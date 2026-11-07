@@ -1,0 +1,279 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#000;overflow:hidden}
+  #wrap{position:relative;width:1200px;height:450px;overflow:hidden;font-family:Inter,'Segoe UI',Helvetica,Arial,sans-serif}
+  canvas{display:block}
+  .shade{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(90deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.55) 24%,rgba(0,0,0,0) 44%),
+               radial-gradient(ellipse at 60% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,.6) 100%)}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay}
+  .lb{position:absolute;left:0;right:0;height:30px;background:#000;display:flex;align-items:center;justify-content:space-between;padding:0 26px;box-sizing:border-box}
+  .lb span{font:600 9.5px 'JetBrains Mono',Consolas,monospace;letter-spacing:3.2px;color:#6f7896}
+  .lb.top{top:0}.lb.bot{bottom:0}
+  .lb b{color:#5eead4;font-weight:800}
+  .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;margin-right:9px;vertical-align:1px}
+  .title{position:absolute;left:44px;top:92px}
+  .eyebrow{font:700 10px 'JetBrains Mono',Consolas,monospace;letter-spacing:5px;color:#f5c451;margin:0 0 14px;display:flex;align-items:center;gap:12px}
+  .eyebrow:before{content:'';width:28px;height:1.5px;background:#f5c451}
+  h1{margin:0;font-family:'Inter Display',Inter,sans-serif;font-weight:900;font-size:58px;letter-spacing:-1.8px;line-height:.92;
+    background:linear-gradient(100deg,#fff 0%,#fff 40%,#ffe7a8 47%,#fff 54%,#fff 100%);background-size:260% 100%;-webkit-background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 24px rgba(0,0,0,.6))}
+  h1 .last{background:linear-gradient(100deg,#f8d47a 0%,#f5c451 40%,#fff3cf 50%,#e9a23b 60%,#f5c451 100%);background-size:260% 100%;-webkit-background-clip:text;color:transparent}
+  .sub{margin:18px 0 0;font-size:16px;font-weight:500;color:#b9c0d8;line-height:1.5;letter-spacing:.1px}
+  .sub em{font-style:normal;color:#fff;font-weight:700}
+  .tag{position:absolute;font:700 9px 'JetBrains Mono',Consolas,monospace;letter-spacing:2.6px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+  .tag i{display:block;width:22px;height:1px}
+  .t1{color:#c4a3ff}.t1 i{background:#c4a3ff}
+  .t2{color:#dbe4f0}.t2 i{background:#dbe4f0}
+  .t3{color:#f5c451}.t3 i{background:#f5c451}
+  .hud{position:absolute;font:700 9px 'JetBrains Mono',Consolas,monospace;letter-spacing:1.8px;color:#9ff5ec;padding:8px 11px;border:1px solid rgba(94,234,212,.45);background:linear-gradient(135deg,rgba(6,40,44,.55),rgba(4,10,20,.35));border-radius:3px;box-shadow:0 0 18px rgba(45,212,191,.18),inset 0 0 12px rgba(45,212,191,.08)}
+  .hud b{display:block;color:#f5c451;font:900 10px 'JetBrains Mono',monospace;letter-spacing:2.6px;margin-bottom:5px}
+  .hud .row{display:flex;justify-content:space-between;gap:14px;line-height:1.75}
+  .hud .row span:last-child{color:#fff}
+  .hud:before{content:'';position:absolute;width:44px;height:1px;background:rgba(94,234,212,.6);top:50%}
+  .hud.l:before{right:-44px}.hud.r:before{left:-44px}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<div id="wrap">
+  <div class="shade"></div>
+  <canvas class="grain" id="grain" width="1200" height="450"></canvas>
+  <div class="title">
+    <p class="eyebrow">SENIOR DATA ENGINEER</p>
+    <h1 style="font-size:44px;letter-spacing:-1.2px;line-height:1.02">I turn raw chaos<br>into <span class="last">data people<br>trust.</span></h1>
+  </div>
+  <div class="hud l" id="H1" style="left:548px;top:118px"><b>POWERS</b><div class="row"><span>SPARK</span><span>ONLINE</span></div><div class="row"><span>DATABRICKS</span><span>ONLINE</span></div><div class="row"><span>AIRFLOW</span><span>ONLINE</span></div><div class="row"><span>KAFKA</span><span>ONLINE</span></div><div class="row"><span>BIGQUERY</span><span>ONLINE</span></div></div>
+  <div class="hud r" id="H2" style="left:1010px;top:150px"><b>FIELD RECORD</b><div class="row"><span>YEARS</span><span>05</span></div><div class="row"><span>PIPELINES SAVED</span><span>300+</span></div><div class="row"><span>INDUSTRIES</span><span>04</span></div><div class="row"><span>SHIPPED</span><span>04</span></div></div>
+  <div class="lb top"><span>INGEST · STORE · TRANSFORM · ORCHESTRATE · TEST · SERVE</span><span>BENGALURU · IN</span></div>
+  <div class="lb bot"><span>SPARK · DATABRICKS · DELTA LAKE · AIRFLOW · BIGQUERY · KAFKA · PYTHON · SQL</span><span><i class="live"></i><b>OPEN TO SENIOR DE ROLES</b></span></div>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+
+const W=1200,H=450,T=10;
+const renderer=new THREE.WebGLRenderer({antialias:false,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+document.getElementById('wrap').prepend(renderer.domElement);
+const scene=new THREE.Scene(),cam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+
+const frag=/*glsl*/`precision highp float;
+uniform float uT;
+uniform float uLoop;
+uniform vec2 uRes;
+uniform int uC;
+varying vec2 vUv;
+#define PI 3.14159265
+#define TAU 6.2831853
+float h11(float p){return fract(sin(p*127.1)*43758.5453);}
+float h21(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+  return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*vn(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}
+float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
+float sdCap(vec3 p,vec3 a,vec3 b,float r){vec3 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h)-r;}
+float sdRB(vec3 p,vec3 b,float r){vec3 q=abs(p)-b;return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.)-r;}
+float sdBox(vec3 p,vec3 b){vec3 q=abs(p)-b;return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.);}
+float PH;   // loop phase
+
+// ---------------- hero
+float capeSDF(vec3 p){
+  float y=p.y;float k=clamp((1.56-y)/1.36,0.,1.);
+  float wind=sin(PH*TAU)*.5+.5;
+  float xo=k*k*(.45+.15*wind);
+  float zc=-.13-k*.30-k*k*.25 + sin(y*5.-PH*TAU*2.+p.x*3.)*.06*k + sin(y*9.-PH*TAU*3.)*.02*k;
+  float w=.26+k*.55;
+  float dx=abs(p.x-xo)-w,dz=abs(p.z-zc)-.012,dy=max(y-1.56,.2-y);
+  return max(max(dx,dz),dy)*.55;
+}
+vec2 hero(vec3 p){
+  // stance: feet apart, fists slightly out
+  vec3 q=p;q.x=abs(q.x);
+  float breathe=sin(PH*TAU*2.)*.006;
+  float d=1e9;
+  // helmet
+  vec3 hp=p-vec3(0.,1.79+breathe,0.);hp.y/=1.15;
+  float head=length(hp)-.12;
+  head=smin(head,sdRB(p-vec3(0.,1.73+breathe,.04),vec3(.06,.03,.07),.03),.05);  // jaw guard
+  head=smin(head,sdRB(p-vec3(0.,1.9,-.01),vec3(.012,.04,.09),.01),.03);d=head;
+  d=smin(d,sdCap(p,vec3(0,1.6,0),vec3(0,1.7,0),.065),.05);
+  // torso
+  float chest=sdRB(p-vec3(0.,1.40+breathe,0.),vec3(.21+ (p.y-1.25)*.25,.15,.1),.07);
+  float abs_=sdRB(p-vec3(0.,1.1,0.),vec3(.12,.13,.08),.05);
+  float pelvis=sdRB(p-vec3(0.,.93,0.),vec3(.16,.07,.095),.04);
+  d=smin(d,smin(chest,smin(abs_,pelvis,.06),.07),.04);
+  // shoulders + arms (mirrored)
+  d=smin(d,length(q-vec3(.31,1.53+breathe,0.))-.115,.06);
+  d=smin(d,sdCap(q,vec3(.33,1.5,0.),vec3(.42,1.18,.02),.072),.04);
+  d=smin(d,sdCap(q,vec3(.42,1.18,.02),vec3(.47,.93,.08),.062),.03);
+  d=smin(d,length(q-vec3(.475,.87,.09))-.066,.03);
+  // legs
+  d=smin(d,sdCap(q,vec3(.1,.9,0.),vec3(.2,.48,.03),.088),.05);
+  d=smin(d,sdCap(q,vec3(.2,.48,.03),vec3(.27,.09,0.),.072),.03);
+  d=smin(d,sdRB(q-vec3(.275,.045,.04),vec3(.055,.03,.1),.02),.03);
+  float c=capeSDF(p);
+  return c<d?vec2(c,2.):vec2(d,1.);
+}
+vec2 scene(vec3 p){
+  vec2 h=hero(p);
+  float ledge=sdBox(p-vec3(0.,-.25,-.1),vec3(1.4,.25,.7));
+  if(ledge<h.x)return vec2(ledge,3.);
+  return h;
+}
+vec3 nrm(vec3 p){vec2 e=vec2(.0015,0.);return normalize(vec3(scene(p+e.xyy).x-scene(p-e.xyy).x,scene(p+e.yxy).x-scene(p-e.yxy).x,scene(p+e.yyx).x-scene(p-e.yyx).x));}
+
+// ---------------- city background
+vec3 city(vec3 rd){
+  float t=PH;
+  // sky: deep navy to hot horizon glow behind the hero
+  float hy=rd.y;
+  vec3 sky=mix(vec3(.05,.035,.08),vec3(.005,.008,.02),smoothstep(-.1,.4,hy));
+  sky+=vec3(1.,.42,.12)*exp(-abs(hy+.06)*12.)*.32+vec3(.15,.6,.7)*exp(-abs(hy-.0)*6.)*.06;
+  // clouds
+  sky+=vec3(.10,.08,.14)*pow(fbm(vec2(rd.x*3.,hy*8.)),3.)*smoothstep(.0,.3,hy)*.8;
+  vec3 col=sky;
+  // searchlights sweeping
+  for(int i=0;i<3;i++){
+    float fi=float(i);
+    float base=-.9+fi*.9;float ang=sin(PH*TAU+fi*2.1)*.35+(fi-1.)*.15;
+    vec2 dir=vec2(sin(ang),cos(ang));
+    vec2 v=vec2(rd.x-base*.5,rd.y+.15);
+    float along=dot(v,dir);float across=abs(v.x*dir.y-v.y*dir.x);
+    float beam=smoothstep(.035+along*.04,.0,across)*step(0.,along)*exp(-along*1.5);
+    col+=mix(vec3(.4,.9,.95),vec3(1.,.8,.5),fi*.5)*beam*.12;
+  }
+  // three skyline layers
+  for(int L=0;L<3;L++){
+    float fl=float(L);
+    float sc=8.+fl*9.;
+    float x=rd.x*sc+fl*13.;
+    float id=floor(x);float fx=fract(x);
+    float h=(.01+h11(id+fl*7.)*.07)*(1.-fl*.2)+(h11(id*3.1)>.88?.06:0.);
+    float hb=h-.07-fl*.02;
+    if(rd.y<hb&&fx>.06&&fx<.94){
+      vec3 bc=mix(vec3(.02,.025,.05),vec3(.05,.04,.08),fl/2.);
+      bc=mix(bc,bc*.3,fl==0.?0.:0.);
+      // windows
+      vec2 w=vec2(fx*9.,rd.y*sc*7.);vec2 wid=floor(w);
+      float lit=step(.7,h21(wid+id*17.+fl*3.))*step(.25,fract(w.x))*step(.3,fract(w.y));
+      vec3 wc=h21(wid+id)>.5?vec3(1.,.75,.4):vec3(.4,.9,.95);
+      bc+=wc*lit*(.22-fl*.06);
+      // rooftop beacons
+      bc+=vec3(1.,.2,.25)*smoothstep(.01,.0,abs(rd.y-hb+.004))*step(.45,abs(fx-.5))*0.;
+      float haze=exp(-fl*.0)*(.25+fl*.25);
+      col=mix(bc,col,haze*.0+fl*.18);
+    }
+  }
+  // flying data streams between towers
+  for(int i=0;i<3;i++){
+    float fi=float(i);
+    float y=-.03+fi*.03+h11(fi)*.015;
+    float band=smoothstep(.0015,.0,abs(rd.y-y-sin(rd.x*3.+fi)*.01));
+    float dash=step(.8,fract(rd.x*(14.+fi*3.)-PH*(fi<2.?2.:-3.)*(1.+fi)));
+    col+=mix(vec3(.3,.95,.9),vec3(1.,.78,.35),mod(fi,2.))*band*dash*.7;
+  }
+  return col;
+}
+
+vec3 shadeHero(vec3 p,vec3 n,vec3 rd,float id){
+  vec3 key=normalize(vec3(-.5,.6,.8));
+  vec3 back=normalize(vec3(.2,.3,-1.));
+  float dif=max(dot(n,key),0.);
+  float rim=pow(1.-max(dot(n,-rd),0.),3.);
+  float bl=max(dot(n,back),0.);
+  vec3 col;
+  if(id<1.5){
+    // armor: gunmetal with panel seams
+    vec3 base=vec3(.06,.07,.09);
+    float seam=(smoothstep(.006,.0,abs(p.y-1.24))+smoothstep(.006,.0,abs(p.y-1.02))+smoothstep(.005,.0,abs(abs(p.x)-.07))*step(1.0,p.y)*step(p.y,1.3))*step(.05,n.z);
+    float spec=pow(max(dot(reflect(rd,n),key),0.),24.);
+    col=base*(.06+dif*.35)+vec3(.8,.85,1.)*spec*.15;
+    col+=vec3(1.,.6,.25)*pow(rim,1.4)*2.2*(.25+bl*1.5)+vec3(.3,.9,.95)*rim*.25*max(n.x,0.);
+    col+=vec3(.25,.95,.9)*seam*1.2;
+    // visor
+    float vis=smoothstep(.022,.012,abs(p.y-1.80))*step(.06,p.z)*step(abs(p.x),.1);
+    col+=vec3(.35,1.,.95)*vis*3.5;
+    // chest core: hexagon emblem
+    vec2 cq=p.xy-vec2(0.,1.40);
+    vec2 a=abs(cq);float hex=max(a.x*.866+a.y*.5,a.y);
+    float emb=smoothstep(.062,.052,hex)*step(.14,p.z);
+    float ring=smoothstep(.006,.0,abs(hex-.075))*step(.13,p.z);
+    float pulse=.75+.25*sin(PH*TAU*4.);
+    col+=vec3(1.,.78,.32)*emb*3.*pulse+vec3(1.,.8,.4)*ring*2.;
+    // gauntlet + boot glow lines
+    col+=vec3(.3,.95,.9)*smoothstep(.01,.0,abs(p.y-.97))*step(.33,abs(p.x))*1.5;
+  }else if(id<2.5){
+    // cape: deep crimson outside, gold lining edge glow
+    vec3 base=vec3(.18,.02,.04);
+    float fold=.6+.4*sin(p.x*18.+p.y*3.);
+    col=base*(.08+dif*.6)*fold;
+    col+=vec3(1.,.45,.15)*rim*1.1+vec3(1.,.35,.2)*bl*.5;
+  }else{
+    // ledge: dark concrete with glowing data edge
+    col=vec3(.03,.035,.05)*(.3+dif);
+    float edge=smoothstep(.02,.0,abs(p.z-.6))*smoothstep(.02,.0,abs(p.y));
+    col+=vec3(.3,.95,.9)*edge*2.;
+    float flow=step(.8,fract(p.x*3.-PH*4.))*smoothstep(.03,.0,abs(p.y))*step(.55,p.z);
+    col+=vec3(1.,.8,.4)*flow*2.;
+  }
+  return col;
+}
+
+void main(){
+  PH=uT/uLoop;
+  vec2 uv=(gl_FragCoord.xy-vec2(.68,.5)*uRes)/uRes.y;
+  float yaw=sin(PH*TAU)*.08;
+  vec3 ro=vec3(sin(yaw)*4.6,.35+sin(PH*TAU*2.)*.02,cos(yaw)*4.3);
+  vec3 ta=vec3(0.,1.0,0.);
+  vec3 fw=normalize(ta-ro),rt=normalize(cross(fw,vec3(0,1,0))),up=cross(rt,fw);
+  vec3 rd=normalize(fw*1.5+uv.x*rt+uv.y*up);
+  // background in world-ish direction (horizon raised for heroic low angle)
+  vec3 col=city(vec3(rd.x,rd.y-.02,rd.z));
+  float t=0.;vec2 h;bool hit=false;
+  for(int i=0;i<110;i++){vec3 p=ro+rd*t;h=scene(p);if(h.x<.0015){hit=true;break;}t+=h.x;if(t>12.)break;}
+  if(hit){
+    vec3 p=ro+rd*t;vec3 n=nrm(p);
+    float ao=clamp(scene(p+n*.05).x/.05,.3,1.);
+    col=shadeHero(p,n,rd,h.y)*ao;
+  }
+  // atmospheric glow halo behind the hero
+  float hd=length((uv-vec2(0.,.12))*vec2(1.,.85));
+  col+=(vec3(1.,.55,.2)*.10/(hd*hd*5.+.18)+vec3(1.,.85,.6)*.05/(hd*hd*40.+.15))*(hit?.0:1.);
+  gl_FragColor=vec4(col,1.);
+}
+`;
+const mat=new THREE.ShaderMaterial({uniforms:{uT:{value:0},uLoop:{value:T},uRes:{value:new THREE.Vector2(W,H)},uCam:{value:new THREE.Vector3()},uC:{value:+(new URLSearchParams(location.search).get('c')||0)}},
+  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:frag,toneMapped:true});
+scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat));
+
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,cam));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),.5,.3,.8));
+composer.addPass(new OutputPass());
+
+// film grain
+const g=document.getElementById('grain').getContext('2d');
+let sd=3;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+function grain(){const im=g.createImageData(W,H);for(let i=0;i<im.data.length;i+=4){const v=rnd()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}g.putImageData(im,0,0)}
+
+const h1=document.querySelector('h1'),last=document.querySelector('.last');
+function proj(x,y,z){const v=new THREE.Vector3(x,y,z);return v}
+window.renderAt=(t)=>{
+  const ph=t/T,TAU=Math.PI*2;
+  const ang=-.35+Math.sin(ph*TAU)*.10, el=.16+Math.sin(ph*TAU*2)*.015, dist=30;
+  const c=new THREE.Vector3(Math.sin(ang)*Math.cos(el)*dist,Math.sin(el)*dist,Math.cos(ang)*Math.cos(el)*dist);
+  mat.uniforms.uT.value=t;mat.uniforms.uCam.value.copy(c);
+  composer.render();grain();
+  const sh=(100-((ph*2)%1)*200)+'% 0';h1.style.backgroundPosition=sh;last.style.backgroundPosition=sh;
+};
+// tag placement (fixed, tuned to the composition)
+const place=(id,x,y)=>{const e=document.getElementById(id);e.style.left=x+'px';e.style.top=y+'px'};
+
+window.ready=true;window.renderAt(0);
+</script>
+</body></html>

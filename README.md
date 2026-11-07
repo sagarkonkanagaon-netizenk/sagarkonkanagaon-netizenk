@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.webp" width="100%" alt="Animated, ray-traced banner: a black hole whose light-bent accretion disk is made of data. Raw violet records swirl at the outer edge, get cleaned to silver, and fall into a gold core. Sagar Konkanagaon, Senior Data Engineer: all data falls toward one thing, a single source of truth.">
+  <img src="assets/banner.webp" width="100%" alt="Animated, ray-traced banner: an original armored data hero with a glowing visor, gold chest core and windswept cape stands on a rooftop over a neon data city at dusk. Holographic panels list his powers (Spark, Databricks, Airflow, Kafka, BigQuery) and field record (5 years, 300+ pipelines, 4 industries, 4 shipped). Headline: I turn raw chaos into data people trust.">
 </p>
 
 <p align="center">
@@ -12,9 +12,11 @@
 I build data platforms end to end, from the first byte ingested to the dashboard, API or AI model that uses it, built to be **reliable, observable and easy to trust**.
 Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-commerce, automotive, finance and industrial IoT. Most recently at eBay, migrating **300+ production pipelines**.
 
-<img src="assets/impact.svg" width="100%" alt="300+ production pipelines migrated at eBay · 5 years building data platforms · 4 industries · 4 things shipped: 2 live sites and 2 open-source projects">
+<img src="assets/h-journey.svg" width="100%" alt="01 The journey">
 
-<img src="assets/h-work.svg" width="100%" alt="01 Selected work">
+<img src="assets/journey.svg" width="100%" alt="Career journey: 2020 to 2024 XL Dynamics, Associate Data Engineer in finance, 20M+ mortgage and risk records. 2024 to 2025 Tiger Analytics, Data Engineer in automotive, Spark runtime cut 35% and a medallion lakehouse. 2025 to 2026 Trane Technologies, Senior Data Engineer in industrial IoT, 10,000+ connected HVAC devices. 2026 to now eBay, Senior Data Engineer in e-commerce, 300+ production pipelines migrated.">
+
+<img src="assets/h-work.svg" width="100%" alt="02 Selected work">
 
 <p align="center">
   <a href="https://data-foundry-sand.vercel.app"><img src="assets/card-foundry.svg" width="49%" alt="The Data Foundry: watch a data pipeline run in 3D, break it on purpose and see how it recovers"></a>
@@ -28,7 +30,7 @@ Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-comme
   <a href="https://github.com/sagarkonkanagaon-netizenk/til"><b>til</b></a> (short notes on what I learn each week)
 </p>
 
-<img src="assets/h-lifecycle.svg" width="100%" alt="02 The whole data lifecycle">
+<img src="assets/h-lifecycle.svg" width="100%" alt="03 The whole data lifecycle">
 
 <img src="assets/lifecycle.svg" width="100%" alt="The data lifecycle: ingest (batch, streams, CDC), store (lakehouse, warehouse), process (Spark batch and streaming), model (bronze, silver, gold, star schemas, SCD2) and serve (BI, APIs, ML features and RAG), with orchestration and quality, governance and lineage running across every stage">
 
@@ -52,11 +54,11 @@ Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-comme
 
 </details>
 
-<img src="assets/h-principles.svg" width="100%" alt="03 How I build">
+<img src="assets/h-principles.svg" width="100%" alt="04 How I build">
 
 <img src="assets/principles.svg" width="100%" alt="Principles: replayable (raw data kept, every write idempotent), fail loudly (bad data stops at the edge), one logic (batch and streaming share one model), next reader (documented tables, clear owners, lineage)">
 
-<img src="assets/h-stack.svg" width="100%" alt="04 Toolbox">
+<img src="assets/h-stack.svg" width="100%" alt="05 Toolbox">
 
 <img src="assets/stack.svg" width="100%" alt="Toolbox. Languages: Python, SQL, PySpark, Shell. Big data: Apache Spark, Kafka, Hadoop, HDFS, YARN, Hive, Sqoop. Lakehouse and warehouse: Databricks, Delta Lake, BigQuery. Orchestration and cloud: Airflow, Azure, Docker, Linux. DevOps and tooling: Git, GitHub Actions, Jira.">
 

@@ -1,10 +1,9 @@
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
 const p=await b.newPage({viewport:{width:1200,height:450}});
-p.on('console',m=>console.log('C:',m.text()));p.on('pageerror',e=>console.log('E:',e.message));
-await p.goto('http://localhost:8765/singularity.html');await p.waitForFunction(()=>window.ready,null,{timeout:60000});
-const times=(process.argv[2]||'0,1.5,3').split(',').map(Number);const fps=+(process.argv[3]||0);
-const list=fps?[...Array(10*fps).keys()].map(i=>i/fps):times;
-let i=0;for(const t of list){const t0=Date.now();await p.evaluate(t=>window.renderAt(t),t);
- await p.locator('#wrap').screenshot({path:`f/${String(i++).padStart(3,'0')}.png`});if(i==1)console.log('ms',Date.now()-t0);}
+p.on('pageerror',e=>console.log('E:',e.message));p.on('console',m=>{const t=m.text();if(/error|ERROR/.test(t))console.log('C:',t.slice(0,600))});
+const c=process.argv[2],out=process.argv[3];const fps=+(process.argv[5]||0);
+await p.goto('http://localhost:8765/hero.html?c='+c);await p.waitForFunction(()=>window.ready,null,{timeout:120000});
+const list=fps?[...Array(10*fps).keys()].map(i=>i/fps):(process.argv[4]||'2').split(',').map(Number);
+let i=0;for(const t of list){await p.evaluate(t=>window.renderAt(t),t);await p.locator('#wrap').screenshot({path:`${out}/${String(i++).padStart(3,'0')}.png`});}
 await b.close();})();

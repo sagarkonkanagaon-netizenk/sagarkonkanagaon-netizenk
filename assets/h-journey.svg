@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="76" viewBox="0 0 1200 76" role="img">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0e1024"/><stop offset="1" stop-color="#04050b"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f5c451" stop-opacity=".55"/><stop offset=".5" stop-color="#2dd4bf" stop-opacity=".25"/><stop offset="1" stop-color="#f5c451" stop-opacity=".1"/></linearGradient>
+  <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+  
+</defs>
+<style>
+  text{font-family:'Segoe UI',Inter,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif} .m{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  
+</style>
+<rect x="1" y="1" width="1198" height="74" rx="16" fill="url(#bg)" stroke="url(#edge)" stroke-width="1.5"/>
+<rect x="1" y="1" width="1198" height="74" rx="16" fill="url(#grid)"/>
+
+<text x="34" y="47" class="m" font-size="14" font-weight="800" fill="#f5c451" letter-spacing="2">01</text>
+<line x1="70" y1="42" x2="96" y2="42" stroke="#f5c451" stroke-width="2"/>
+<text x="110" y="49" font-size="24" font-weight="800" fill="#eef1fa" letter-spacing="-.3">The journey</text>
+<text x="1166" y="47" text-anchor="end" class="m" font-size="11" font-weight="600" letter-spacing="2" fill="#98a1c0">2020 → NOW · 4 INDUSTRIES</text>
+<rect x="110" y="60" width="44" height="3" rx="1.5" fill="#f5c451"><animate attributeName="width" values="44;120;44" dur="5s" repeatCount="indefinite"/></rect>
+</svg>

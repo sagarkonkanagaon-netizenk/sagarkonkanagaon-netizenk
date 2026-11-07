@@ -119,10 +119,11 @@ def header(name, num, title, sub):
 <rect x="110" y="60" width="44" height="3" rx="1.5" fill="{GOLD}"><animate attributeName="width" values="44;120;44" dur="5s" repeatCount="indefinite"/></rect>"""
     write(f"h-{name}.svg", frame(W, H, inner))
 
-header("work", "01", "Selected work", "LIVE PRODUCTS · OPEN SOURCE")
-header("lifecycle", "02", "The whole data lifecycle", "FIRST BYTE TO LAST DASHBOARD")
-header("principles", "03", "How I build", "PRINCIPLES I DON'T SKIP")
-header("stack", "04", "Toolbox", "TOOLS I SHIP WITH")
+header("journey", "01", "The journey", "2020 → NOW · 4 INDUSTRIES")
+header("work", "02", "Selected work", "LIVE PRODUCTS · OPEN SOURCE")
+header("lifecycle", "03", "The whole data lifecycle", "FIRST BYTE TO LAST DASHBOARD")
+header("principles", "04", "How I build", "PRINCIPLES I DON'T SKIP")
+header("stack", "05", "Toolbox", "TOOLS I SHIP WITH")
 
 # ---------------------------------------------------------------- lifecycle diagram
 def lifecycle():
@@ -263,5 +264,38 @@ def impact():
                      f'<text x="{cx:.0f}" y="118" text-anchor="middle" class="m" font-size="10.5" font-weight="600" letter-spacing="1" fill="{MUTED}">{esc(l2)}</text></g>')
     write("impact.svg", frame(W, H, "".join(parts)))
 
-impact()
+
+# ---------------------------------------------------------------- career journey
+def journey():
+    W, H = 1200, 300
+    stops = [
+        ("2020 – 2024", "XL Dynamics", "Associate Data Engineer · Finance", "20M+", "mortgage & risk records", "#7cc4ff"),
+        ("2024 – 2025", "Tiger Analytics", "Data Engineer · Automotive", "−35%", "faster Spark on a lakehouse", "#c4a3ff"),
+        ("2025 – 2026", "Trane Technologies", "Senior DE · Industrial IoT", "10K+", "connected HVAC devices", TEAL),
+        ("2026 – NOW", "eBay", "Senior Data Engineer · E-commerce", "300+", "production pipelines migrated", GOLD),
+    ]
+    y = 92
+    xs = [150 + i * 300 for i in range(4)]
+    parts = [f'<line x1="60" y1="{y}" x2="{W-60}" y2="{y}" stroke="{LINE}" stroke-width="2"/>',
+             f'<line x1="60" y1="{y}" x2="{W-60}" y2="{y}" stroke="url(#trail)" stroke-width="2.5"/>']
+    for i, (yr, co, role, n, what, c) in enumerate(stops):
+        x = xs[i]
+        b = i * 1.5
+        parts.append(f'<text x="{x}" y="{y-26}" text-anchor="middle" class="m" font-size="11" font-weight="800" letter-spacing="2" fill="{c}">{esc(yr)}</text>')
+        parts.append(f'<circle cx="{x}" cy="{y}" r="13" fill="{c}" fill-opacity=".12" stroke="{c}" stroke-opacity=".5">'
+                     f'<animate attributeName="r" values="11;17;11" dur="6s" begin="{b}s" repeatCount="indefinite"/></circle>')
+        parts.append(f'<circle cx="{x}" cy="{y}" r="5.5" fill="{c}"/>')
+        parts.append(f'<rect x="{x-130}" y="{y+30}" width="260" height="160" rx="12" fill="{CARD}" stroke="{c}" stroke-opacity=".35"/>')
+        parts.append(f'<line x1="{x}" y1="{y+14}" x2="{x}" y2="{y+30}" stroke="{c}" stroke-opacity=".5"/>')
+        parts.append(f'<text x="{x-110}" y="{y+64}" font-size="19" font-weight="800" fill="{TXT}">{esc(co)}</text>')
+        parts.append(f'<text x="{x-110}" y="{y+86}" font-size="12.5" fill="{MUTED}">{esc(role)}</text>')
+        parts.append(f'<text x="{x-110}" y="{y+134}" font-size="34" font-weight="900" fill="{c}" letter-spacing="-1">{esc(n)}</text>')
+        parts.append(f'<text x="{x-110}" y="{y+162}" class="m" font-size="10.5" font-weight="600" letter-spacing=".6" fill="{MUTED}">{esc(what)}</text>')
+    if True:
+        parts.append(f'<g><circle r="5" fill="#fff"/><circle r="12" fill="{GOLD}" opacity=".25"/>'
+                     f'<animateMotion dur="6s" repeatCount="indefinite" path="M60,{y} H{W-60}"/></g>')
+    defs = f'<linearGradient id="trail" gradientUnits="userSpaceOnUse" x1="60" y1="0" x2="1140" y2="0"><stop offset="0" stop-color="#7cc4ff" stop-opacity=".2"/><stop offset=".5" stop-color="{TEAL}" stop-opacity=".6"/><stop offset="1" stop-color="{GOLD}"/></linearGradient>'
+    write("journey.svg", frame(W, H, "".join(parts), extra_defs=defs))
+
+journey()
 print("ok")
