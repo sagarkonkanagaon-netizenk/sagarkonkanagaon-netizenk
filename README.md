@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.webp" width="100%" alt="Animated 3D banner: Sagar Konkanagaon in large white-to-gold type above a glowing gold line on a mirror floor, fed by streams of data that flow out of glowing tiles for Spark, Kafka, Databricks, Delta Lake, Airflow, BigQuery, Python, SQL and Hadoop. Senior Data Engineer: 5 years, 300+ pipelines migrated, 4 industries, 4 products shipped.">
+  <img src="assets/banner.webp" width="100%" alt="Animated, ray-traced banner: an original armored data hero with a glowing visor, gold chest core and windswept cape stands on a rooftop over a neon data city at dusk. Holographic panels list his powers (Spark, Databricks, Airflow, Kafka, BigQuery) and field record (5 years, 300+ pipelines, 4 industries, 4 shipped). Headline: I turn raw chaos into data people trust.">
 </p>
 
 <p align="center">
