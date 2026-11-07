@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/banner.webp" width="100%" alt="Animated banner: an original armored data gauntlet with five glowing gems snaps its fingers, a shockwave sweeps a holographic hex floor, and a world of data builds itself: a crystal core in a violet light vortex, glass grid platforms linked by golden data arcs, and floating wireframe data cubes.">
+  <picture>
+    <source srcset="assets/banner.avif" type="image/avif">
+    <img src="assets/banner.webp" width="100%" alt="Animated cinematic banner: the camera slowly pushes into an impossible data architecture. Silver highways spiral through floating islands, waterfalls pour off the platforms, light pulses race along the roads, and a glowing crystal core sends out scan rings. Chaotic amber ruins sit on the left and an ordered ice-blue city on the right. Text: Sagar Konkanagaon, Senior Data Engineer, Architecting intelligence from chaos.">
+  </picture>
 </p>
 
 <p align="center">
