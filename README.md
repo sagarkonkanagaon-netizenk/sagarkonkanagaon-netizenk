@@ -9,6 +9,7 @@ that uses it, built to be **reliable, observable and easy to trust**.
 Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-commerce,
 automotive, finance and industrial IoT. Most recently at eBay, migrating 300+ production pipelines.
 
+- 🍛 **[Data Dhaba](https://datadhaba.in)**: a hands-on data engineering learning site I run, with handbooks, SQL and Python labs, a 24-week path and interview prep
 - 🏭 **[The Data Foundry](https://data-foundry-sand.vercel.app)**: watch a live pipeline run, break it on purpose, and see how it recovers
 - 🧪 **[spark-pipeline-labs](https://github.com/sagarkonkanagaon-netizenk/spark-pipeline-labs)**: production patterns (streaming dedup, SCD2, skew salting, idempotent backfills) as tested PySpark + Delta code
 - 📓 **[til](https://github.com/sagarkonkanagaon-netizenk/til)**: short notes on what I learn each week
