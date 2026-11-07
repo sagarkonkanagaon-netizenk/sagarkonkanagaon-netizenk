@@ -1,44 +1,38 @@
 <p align="center">
-  <img src="banner.webp" alt="Animated 3D banner: a caped data superhero dives in, makes a superhero landing, smashes bad records, fixes a broken pipeline and throws the data downstream" width="100%"/>
+  <img src="assets/banner.webp" width="100%" alt="Animated 3D banner: raw, chaotic records stream through bronze, silver and gold rings and come out as clean gold data. A failed quality check pulls one bad record into quarantine, an orchestration rail pulses underneath, and the gold core feeds BI, APIs and AI.">
 </p>
 
-### Hi, I'm Sagar 👋
+<p align="center">
+  <a href="https://data-foundry-sand.vercel.app"><b>The Data Foundry</b></a> ·
+  <a href="https://datadhaba.in"><b>Data Dhaba</b></a> ·
+  <a href="https://www.linkedin.com/in/sagar-konkanagaon-346914156"><b>LinkedIn</b></a> ·
+  <a href="mailto:sagarkonkanagaon@gmail.com"><b>Email</b></a>
+</p>
 
-I build data platforms end to end, from the first byte ingested to the dashboard, API or AI model
-that uses it, built to be **reliable, observable and easy to trust**.
-Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-commerce,
-automotive, finance and industrial IoT. Most recently at eBay, migrating 300+ production pipelines.
+I build data platforms end to end, from the first byte ingested to the dashboard, API or AI model that uses it, built to be **reliable, observable and easy to trust**.
+Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-commerce, automotive, finance and industrial IoT. Most recently at eBay, migrating **300+ production pipelines**.
 
-- 🏭 **[The Data Foundry](https://data-foundry-sand.vercel.app)**: watch a live pipeline run, break it on purpose, and see how it recovers
-- 🧪 **[spark-pipeline-labs](https://github.com/sagarkonkanagaon-netizenk/spark-pipeline-labs)**: production patterns (streaming dedup, SCD2, skew salting, idempotent backfills) as tested PySpark + Delta code
-- 📓 **[til](https://github.com/sagarkonkanagaon-netizenk/til)**: short notes on what I learn each week
+<img src="assets/h-work.svg" width="100%" alt="01 Selected work">
 
-### 🗺️ The whole data engineering lifecycle
+<p align="center">
+  <a href="https://data-foundry-sand.vercel.app"><img src="assets/card-foundry.svg" width="49%" alt="The Data Foundry: watch a data pipeline run in 3D, break it on purpose and see how it recovers"></a>
+  <a href="https://datadhaba.in"><img src="assets/card-dhaba.svg" width="49%" alt="Data Dhaba: a data engineering school with handbooks, SQL and Python labs and a 24-week path"></a>
+  <a href="https://github.com/sagarkonkanagaon-netizenk/number-passport"><img src="assets/card-passport.svg" width="49%" alt="Number Passport: trace any reported number back to its source rows and prove it"></a>
+  <a href="https://github.com/sagarkonkanagaon-netizenk/deja"><img src="assets/card-deja.svg" width="49%" alt="deja: memory for Claude Code and Codex that never debugs the same bug twice"></a>
+</p>
 
-```mermaid
-flowchart LR
-  subgraph IN[Ingest]
-    A1[Batch & APIs]
-    A2[Streaming events]
-    A3[CDC from databases]
-  end
-  subgraph ST[Store]
-    B1[(Data lake / lakehouse)]
-    B2[(Warehouse)]
-  end
-  subgraph TR[Transform & model]
-    C1[Clean · dedup · conform]
-    C2[Dimensional models · SCD2]
-  end
-  subgraph SV[Serve]
-    D1[BI & dashboards]
-    D2[APIs & reverse ETL]
-    D3[ML features · RAG]
-  end
-  IN --> ST --> TR --> SV
-  GOV{{Governance · quality · lineage · security}} -.-> ST & TR & SV
-  OPS{{Orchestration · CI/CD · observability · cost}} -.-> IN & TR
-```
+<p align="center">
+  Also: <a href="https://github.com/sagarkonkanagaon-netizenk/spark-pipeline-labs"><b>spark-pipeline-labs</b></a> (streaming dedup, SCD2, skew salting and idempotent backfills as tested PySpark + Delta code) ·
+  <a href="https://github.com/sagarkonkanagaon-netizenk/til"><b>til</b></a> (short notes on what I learn each week)
+</p>
+
+<img src="assets/h-lifecycle.svg" width="100%" alt="02 The whole data lifecycle">
+
+<img src="assets/lifecycle.svg" width="100%" alt="The data lifecycle: ingest (batch, streams, CDC), store (lakehouse, warehouse), process (Spark batch and streaming), model (bronze, silver, gold, star schemas, SCD2) and serve (BI, APIs, ML features and RAG), with orchestration and quality, governance and lineage running across every stage">
+
+<details>
+<summary><b>Stage by stage: what I care about</b></summary>
+<br>
 
 | Stage | What I care about |
 |---|---|
@@ -52,60 +46,25 @@ flowchart LR
 | **Serving** | BI-ready marts, semantic layers, APIs and reverse ETL, ML feature tables |
 | **DataOps** | Everything as code: Git, CI on every PR, Docker, tested pipelines, safe deploys and rollbacks |
 | **Cost & performance** | Right-sized clusters, pruning, caching, Z-ordering, and knowing what each query costs |
+| **AI on top** | Clean, documented tables that feed ML features and RAG; retrieval-backed chat like The Data Foundry's "Ask the Engine" |
 
-### 🏛️ Architecture principles
+</details>
 
-- **Replayable by design**: raw data is kept, every step can be re-run, every write is idempotent
-- **Fail loudly**: bad data is stopped at the edge and alerted on, never silently passed downstream
-- **Batch and streaming, one model**: the same logic serves both, so numbers agree
-- **Built for the next reader**: documented tables, clear ownership, lineage you can follow
+<img src="assets/h-principles.svg" width="100%" alt="03 How I build">
 
-### ☁️ Cloud-native implementation
+<img src="assets/principles.svg" width="100%" alt="Principles: replayable (raw data kept, every write idempotent), fail loudly (bad data stops at the edge), one logic (batch and streaming share one model), next reader (documented tables, clear owners, lineage)">
 
-- **Compute:** Databricks and Spark clusters that autoscale, serverless SQL where it fits
-- **Storage:** cloud object storage with Delta Lake tables, BigQuery for analytics
-- **Platform:** containers, infrastructure as code, secrets and access managed centrally
-- **Delivery:** CI/CD for pipelines like any other software, with tests before anything touches prod
+<img src="assets/h-stack.svg" width="100%" alt="04 Toolbox">
 
-### 🤖 AI on top of the data
+<img src="assets/stack.svg" width="100%" alt="Toolbox. Languages: Python, SQL, PySpark, Shell. Big data: Apache Spark, Kafka, Hadoop, HDFS, YARN, Hive, Sqoop. Lakehouse and warehouse: Databricks, Delta Lake, BigQuery. Orchestration and cloud: Airflow, Azure, Docker, Linux. DevOps and tooling: Git, GitHub Actions, Jira.">
 
-- **LLM apps on real data:** The Data Foundry's "Ask the Engine" chat answers questions with retrieval (BM25) over curated content
-- **AI-ready data:** clean, documented tables that feed ML features and RAG instead of a pile of CSVs
-- **AI for operations:** anomaly and drift detection that flags problems early, so engineers fix them fast
+<p align="center">
+  <img src="assets/footer.svg" width="100%" alt="Let's build data people trust. Open to Senior Data Engineer roles.">
+</p>
 
-### 🧰 Toolbox
-
-**Languages**<br/>
-![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
-![SQL](https://img.shields.io/badge/SQL-4169E1?logo=postgresql&logoColor=white)
-![Shell Script](https://img.shields.io/badge/Shell%20Script-4EAA25?logo=gnubash&logoColor=white)
-![PySpark](https://img.shields.io/badge/PySpark-E25A1C?logo=apachespark&logoColor=white)
-
-**Big data & Hadoop ecosystem**<br/>
-![Apache Hadoop](https://img.shields.io/badge/Apache%20Hadoop-66CCFF?logo=apachehadoop&logoColor=black)
-![HDFS](https://img.shields.io/badge/HDFS-2C3E50)
-![YARN](https://img.shields.io/badge/YARN-2C3E50)
-![Apache Hive](https://img.shields.io/badge/Apache%20Hive-FDEE21?logo=apachehive&logoColor=black)
-![Sqoop](https://img.shields.io/badge/Sqoop-4A5568)
-![Apache Spark](https://img.shields.io/badge/Apache%20Spark-E25A1C?logo=apachespark&logoColor=white)
-![Kafka](https://img.shields.io/badge/Kafka-231F20?logo=apachekafka&logoColor=white)
-
-**Lakehouse & warehouse**<br/>
-![Databricks](https://img.shields.io/badge/Databricks-FF3621?logo=databricks&logoColor=white)
-![Delta Lake](https://img.shields.io/badge/Delta%20Lake-00ADD4?logo=delta&logoColor=white)
-![BigQuery](https://img.shields.io/badge/BigQuery-669DF6?logo=googlebigquery&logoColor=white)
-
-**Orchestration & cloud**<br/>
-![Airflow](https://img.shields.io/badge/Airflow-017CEE?logo=apacheairflow&logoColor=white)
-![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoftazure&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
-
-**DevOps & tooling**<br/>
-![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
-![Jira](https://img.shields.io/badge/Jira-0052CC?logo=jira&logoColor=white)
-
-**Currently:** open to Senior Data Engineer roles ·
-[LinkedIn](https://www.linkedin.com/in/sagar-konkanagaon-346914156) ·
-[sagarkonkanagaon@gmail.com](mailto:sagarkonkanagaon@gmail.com)
+<p align="center">
+  <a href="https://www.linkedin.com/in/sagar-konkanagaon-346914156">LinkedIn</a> ·
+  <a href="mailto:sagarkonkanagaon@gmail.com">sagarkonkanagaon@gmail.com</a> ·
+  <a href="https://data-foundry-sand.vercel.app">data-foundry-sand.vercel.app</a> ·
+  <a href="https://datadhaba.in">datadhaba.in</a>
+</p>

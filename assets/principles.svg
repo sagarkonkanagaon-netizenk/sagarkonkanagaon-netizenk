@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="200" viewBox="0 0 1200 200" role="img">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1430"/><stop offset="1" stop-color="#070a18"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f5c451" stop-opacity=".55"/><stop offset=".5" stop-color="#2dd4bf" stop-opacity=".25"/><stop offset="1" stop-color="#f5c451" stop-opacity=".1"/></linearGradient>
+  <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+  
+</defs>
+<style>
+  text{font-family:'Segoe UI',Inter,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif} .m{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  
+</style>
+<rect x="1" y="1" width="1198" height="198" rx="16" fill="url(#bg)" stroke="url(#edge)" stroke-width="1.5"/>
+<rect x="1" y="1" width="1198" height="198" rx="16" fill="url(#grid)"/>
+<rect x="36" y="28" width="264" height="144" rx="12" fill="#0b1126" stroke="#1d2647"/><rect x="56" y="48" width="28" height="4" rx="2" fill="#d9822b"/><text x="56" y="84" font-size="20" font-weight="800" fill="#eef1fa">Replayable</text><text x="56" y="114" font-size="15.5" fill="#98a1c0">Raw data is kept, every step</text><text x="56" y="136" font-size="15.5" fill="#98a1c0">can re-run, every write is</text><text x="56" y="158" font-size="15.5" fill="#98a1c0">idempotent.</text><rect x="320" y="28" width="264" height="144" rx="12" fill="#0b1126" stroke="#1d2647"/><rect x="340" y="48" width="28" height="4" rx="2" fill="#ef6b5b"/><text x="340" y="84" font-size="20" font-weight="800" fill="#eef1fa">Fail loudly</text><text x="340" y="114" font-size="15.5" fill="#98a1c0">Bad data stops at the edge</text><text x="340" y="136" font-size="15.5" fill="#98a1c0">and alerts. Nothing slips</text><text x="340" y="158" font-size="15.5" fill="#98a1c0">downstream.</text><rect x="604" y="28" width="264" height="144" rx="12" fill="#0b1126" stroke="#1d2647"/><rect x="624" y="48" width="28" height="4" rx="2" fill="#a9b6c8"/><text x="624" y="84" font-size="20" font-weight="800" fill="#eef1fa">One logic</text><text x="624" y="114" font-size="15.5" fill="#98a1c0">Batch and streaming share one</text><text x="624" y="136" font-size="15.5" fill="#98a1c0">model, so the numbers agree.</text><rect x="888" y="28" width="264" height="144" rx="12" fill="#0b1126" stroke="#1d2647"/><rect x="908" y="48" width="28" height="4" rx="2" fill="#2dd4bf"/><text x="908" y="84" font-size="20" font-weight="800" fill="#eef1fa">Next reader</text><text x="908" y="114" font-size="15.5" fill="#98a1c0">Documented tables, clear</text><text x="908" y="136" font-size="15.5" fill="#98a1c0">owners, lineage anyone can</text><text x="908" y="158" font-size="15.5" fill="#98a1c0">follow.</text>
+</svg>
