@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.webp" width="100%" alt="Animated, ray-traced banner: an original armored data hero with a glowing visor, gold chest core and windswept cape stands on a rooftop over a neon data city at dusk. Holographic panels list his powers (Spark, Databricks, Airflow, Kafka, BigQuery) and field record (5 years, 300+ pipelines, 4 industries, 4 shipped). Headline: I turn raw chaos into data people trust.">
+  <img src="assets/banner.webp" width="100%" alt="Animated banner: an original armored data gauntlet with five glowing gems snaps its fingers, a shockwave sweeps a holographic hex floor, and a world of data builds itself: a crystal core in a violet light vortex, glass grid platforms linked by golden data arcs, and floating wireframe data cubes.">
 </p>
 
 <p align="center">
