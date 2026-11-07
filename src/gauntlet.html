@@ -24,7 +24,7 @@
 <div id="wrap">
   <div class="vig"></div>
   <div id="flash" style="position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse 40% 90% at 50% 45%,#fff 0%,#ffe7b0 25%,rgba(120,160,255,.5) 55%,rgba(0,0,0,0) 80%)"></div>
-  <canvas class="grain" id="grain"></canvas>
+  <canvas class="grain" id="grain" style="display:none"></canvas>
   <div class="id" style="display:none">
     <svg class="mono" viewBox="0 0 64 64" fill="none">
       <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".55" stop-color="#9aa6b8"/><stop offset="1" stop-color="#5d6878"/></linearGradient></defs>
@@ -106,10 +106,10 @@ const NV=16000,vg=new THREE.BufferGeometry(),vp=new Float32Array(NV*3),vc=new Fl
 const vcols=['#5b6bff','#8a5cff','#3fd0ff','#b071ff','#2a8cff','#d38bff'].map(c=>new THREE.Color(c));
 for(let i=0;i<NV;i++){const arm=i%5;vd.push({arm,u:rnd(),r0:rnd(),jit:(rnd()-.5),h:(rnd()-.5),c:vcols[Math.floor(rnd()*vcols.length)],b:.4+rnd()*.9})}
 vg.setAttribute('position',new THREE.BufferAttribute(vp,3));vg.setAttribute('color',new THREE.BufferAttribute(vc,3));
-add(new THREE.Points(vg,ptsMat(.075)));
+add(new THREE.Points(vg,ptsMat(.1)));
 // ---- crystal hologram core ----
 const crystal=new THREE.Group();crystal.position.set(VX.x,-.1,VX.z);add(crystal);
-const cfaceM=new THREE.MeshBasicMaterial({color:C('#3fb8ff',.16),...AB,side:THREE.DoubleSide});
+const cfaceM=new THREE.MeshBasicMaterial({color:C('#3fb8ff',.07),...AB,side:THREE.DoubleSide});
 const cedgeM=new THREE.LineBasicMaterial({color:C('#9ff0ff',1.9),...AB});
 const cedge2=new THREE.LineBasicMaterial({color:C('#b38cff',1.4),...AB,opacity:.8});
 function shard(geo,pos,rot,sc,edgeM){const g=new THREE.Group();g.position.copy(pos);g.rotation.set(...rot);g.scale.setScalar(sc);
@@ -122,7 +122,7 @@ for(let i=0;i<16;i++){const a=i/16*TAU+rnd()*.3,r=.55+rnd()*.6,y=(rnd()-.4)*1.5;
   const s=shard(geo,V(Math.cos(a)*r,y,Math.sin(a)*r),[rnd()*.9-.45+(y>0?0:Math.PI),a,rnd()*.9-.45],.9+rnd()*.5,i%3?cedgeM:cedge2);shards.push(s);}
 // inner engraved detail: wireframe geodesic + rings
 crystal.add(new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(.62,1)),new THREE.LineBasicMaterial({color:C('#7fe3ff',1.2),...AB,opacity:.55})));
-const coreSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:C('#7fe8ff',1.0),...AB}));coreSpr.scale.set(2.2,2.2,1);crystal.add(coreSpr);
+const coreSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:C('#7fe8ff',.45),...AB}));coreSpr.scale.set(2.2,2.2,1);crystal.add(coreSpr);
 const coreSpr2=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:C('#3a7dff',.3),...AB}));coreSpr2.scale.set(7,7,1);crystal.add(coreSpr2);
 // orange nodes on the crystal
 const nodeP=[];for(let i=0;i<10;i++){const a=rnd()*TAU,y=(rnd()-.5)*1.6,r=.6+rnd()*.5;nodeP.push(V(Math.cos(a)*r,y,Math.sin(a)*r))}
@@ -255,7 +255,7 @@ const dust=new THREE.Points(dg,ptsMat(.035));G.add(dust);
 
 const composer=new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene,camera));
-composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),.75,.5,.2));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),.6,.35,.22));
 composer.addPass(new OutputPass());
 const gc=document.getElementById('grain');gc.width=W/2;gc.height=H/2;const gx=gc.getContext('2d');
 function grain(){const im=gx.createImageData(gc.width,gc.height);for(let i=0;i<im.data.length;i+=4){const v=rnd()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}gx.putImageData(im,0,0)}
@@ -299,12 +299,12 @@ window.renderAt=(t)=>{
     const ang=d.arm/5*TAU + (1-u)*4.2 + t*.9 + d.jit*.25;
     vp[i*3]=VX.x+Math.cos(ang)*r*1.15;vp[i*3+2]=VX.z+Math.sin(ang)*r*.82;vp[i*3+1]=VX.y+d.h*.25*(1-u)+u*.6;
     const vis=sm((B*10-r)/1.8);
-    const fade=sm(u/.12)*(1-sm((u-.9)/.1));const b=d.b*fade*(.4+.6*u)*vis*.8;
+    const fade=sm(u/.12)*(1-sm((u-.9)/.1));const b=d.b*fade*(.5+.7*u)*vis*1.1;
     tc.copy(d.c).lerp(new THREE.Color('#8ff0ff'),u*.5);vc[i*3]=tc.r*b;vc[i*3+1]=tc.g*b;vc[i*3+2]=tc.b*b;}
   vg.attributes.position.needsUpdate=true;vg.attributes.color.needsUpdate=true;
   const cb=sm(B/.3);crystal.scale.setScalar(Math.max(.001,cb*(1+.25*Math.sin(cb*Math.PI))));
   crystal.rotation.y=t*.35;crystal.position.y=-.1+Math.sin(t*1.2)*.06;
-  const beat=.5+.5*Math.sin(t*2.4);coreSpr.scale.setScalar(2.0+beat*.4);
+  const beat=.5+.5*Math.sin(t*2.4);coreSpr.scale.setScalar(1.5+beat*.3);
   plats.forEach(p=>{const pb=sm((B*1.25-p.d/16)/.3);p.g.visible=pb>.002;p.g.scale.setScalar(Math.max(.001,pb));p.g.position.y=p.y0-(1-pb)*2.5+Math.sin(t*.8+p.d)*.04*pb;});
   const arev=cl((B-.3)/.55);
   for(let i=0;i<NA;i++){const d=ad[i];const u=mod(d.u+t*.12*d.sp,1);arcs[d.k].getPoint(u,q);q.add(d.o);
