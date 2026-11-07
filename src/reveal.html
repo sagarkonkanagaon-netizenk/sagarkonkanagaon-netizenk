@@ -1,0 +1,212 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#000;overflow:hidden}
+  #wrap{position:relative;width:1200px;height:450px;overflow:hidden;font-family:Inter,'Segoe UI',Helvetica,Arial,sans-serif}
+  canvas{display:block}
+  .vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 50%,rgba(0,0,0,.72) 100%)}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.045;mix-blend-mode:overlay}
+  .lb{position:absolute;left:0;right:0;height:30px;background:#000;display:flex;align-items:center;justify-content:space-between;padding:0 26px;box-sizing:border-box}
+  .lb span{font:600 9.5px 'JetBrains Mono',Consolas,monospace;letter-spacing:3.2px;color:#6f7896}
+  .lb.top{top:0}.lb.bot{bottom:0}
+  .lb b{color:#5eead4;font-weight:800}
+  .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;margin-right:9px;vertical-align:1px}
+  .sub{position:absolute;left:0;right:0;top:322px;text-align:center}
+  .sub .role{font:800 12px 'JetBrains Mono',Consolas,monospace;letter-spacing:9px;color:#f5c451;margin:0}
+  .sub .line{margin:12px 0 0;font-size:15.5px;font-weight:500;color:#aab2cc;letter-spacing:.3px}
+  .sub .line em{font-style:normal;color:#fff;font-weight:700}
+  .sub .rule{display:inline-block;width:46px;height:1px;vertical-align:4px;margin:0 16px;background:linear-gradient(90deg,transparent,#f5c451)}
+  .sub .rule.r{background:linear-gradient(90deg,#f5c451,transparent)}
+  .tile{position:absolute;transform:translate(-50%,-50%);font:800 10px 'JetBrains Mono',Consolas,monospace;letter-spacing:2.2px;white-space:nowrap;text-shadow:0 0 12px currentColor}
+  .stat{position:absolute;top:318px;width:250px}
+  .stat.l{left:40px;text-align:left}.stat.r{right:40px;text-align:right}
+  .stat .row{display:inline-flex;align-items:baseline;gap:10px;margin:0 0 6px}
+  .stat .n{font:900 30px 'Inter Display',Inter,sans-serif;letter-spacing:-1px;color:#fff;font-variant-numeric:tabular-nums}
+  .stat .n.g{color:#f5c451}
+  .stat .k{font:700 9px 'JetBrains Mono',Consolas,monospace;letter-spacing:2.4px;color:#8b93b0;line-height:1.3}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<div id="wrap">
+  <div class="vig"></div>
+  <canvas class="grain" id="grain" width="1200" height="450"></canvas>
+  <div class="sub">
+    <p class="role"><span class="rule"></span>SENIOR DATA ENGINEER<span class="rule r"></span></p>
+    <p class="line">Forged from raw data. <em>Built to be trusted.</em></p>
+  </div>
+  <div class="stat l"><div class="row"><span class="n g" id="S1">05</span><span class="k">YEARS<br>BUILDING DATA</span></div><br><div class="row"><span class="n" id="S2">300+</span><span class="k">PIPELINES<br>MIGRATED</span></div></div>
+  <div class="stat r"><div class="row"><span class="k">INDUSTRIES<br>E-COM · AUTO · FIN · IoT</span><span class="n" id="S3">04</span></div><br><div class="row"><span class="k">PRODUCTS<br>SHIPPED</span><span class="n g" id="S4">04</span></div></div>
+  <div id="tiles"></div>
+  <div class="lb top"><span>INGEST · STORE · TRANSFORM · ORCHESTRATE · TEST · SERVE</span><span>BENGALURU · IN</span></div>
+  <div class="lb bot"><span>SPARK · DATABRICKS · DELTA LAKE · AIRFLOW · BIGQUERY · KAFKA · PYTHON · SQL</span><span><i class="live"></i><b>OPEN TO SENIOR DE ROLES</b></span></div>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import {TTFLoader} from 'three/addons/loaders/TTFLoader.js';
+import {Font} from 'three/addons/loaders/FontLoader.js';
+import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
+import {MeshSurfaceSampler} from 'three/addons/math/MeshSurfaceSampler.js';
+import {Reflector} from 'three/addons/objects/Reflector.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+
+const W=1200,H=450,T=10,TAU=Math.PI*2;
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const sm=x=>{x=cl(x);return x*x*(3-2*x)};
+const mod=(a,n)=>((a%n)+n)%n;
+let sd=11;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+document.getElementById('wrap').prepend(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#020309');
+scene.fog=new THREE.Fog('#020309',30,70);
+const camera=new THREE.PerspectiveCamera(28,W/H,.1,200);
+
+// ----- studio environment for chrome reflections; one strip sweeps across -----
+const envScene=new THREE.Scene();envScene.background=new THREE.Color('#0d0f1c');
+const stripMat=c=>new THREE.MeshBasicMaterial({color:new THREE.Color(c),side:THREE.DoubleSide});
+const strips=[];
+[[0,6,10,30,2.5,'#c9d4ff',2.2],[0,-4,9,40,1.2,'#f5c451',1.6],[-10,2,6,2,16,'#c4a3ff',2.4],[10,2,6,2,16,'#5eead4',2.4],[0,9,0,30,4,'#ffffff',1.2],[0,3,12,26,9,'#9aa6d0',.9],[0,1,-10,30,2,'#8090c0',1.0]].forEach(([x,y,z,w,h,c,k])=>{
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),stripMat(new THREE.Color(c).multiplyScalar(k)));m.position.set(x,y,z);m.lookAt(0,0,0);envScene.add(m);});
+const sweep=new THREE.Mesh(new THREE.PlaneGeometry(3,30),stripMat(new THREE.Color('#ffffff').multiplyScalar(2.2)));envScene.add(sweep);
+const pmrem=new THREE.PMREMGenerator(renderer);
+let envRT=null;
+function updateEnv(ph){
+  const a=-1.3+ph*2.6; // sweep moves across front
+  sweep.position.set(Math.sin(a)*10,1,Math.cos(a)*10);sweep.lookAt(0,1,0);
+  sweep.visible=ph<.98;
+  if(envRT)envRT.dispose();envRT=pmrem.fromScene(envScene,.02);scene.environment=envRT.texture;
+}
+
+scene.add(new THREE.HemisphereLight('#c7d2fe','#05040c',.25));
+const key=new THREE.DirectionalLight('#ffffff',2.0);key.position.set(-4,8,10);scene.add(key);
+const rimL=new THREE.PointLight('#c4a3ff',30,30,2);rimL.position.set(-12,3,-4);scene.add(rimL);
+const rimR=new THREE.PointLight('#2dd4bf',30,30,2);rimR.position.set(12,3,-4);scene.add(rimR);
+
+// ----- mirror floor -----
+const floorY=-1.05;
+const mirror=new Reflector(new THREE.PlaneGeometry(120,60),{textureWidth:W,textureHeight:H,color:new THREE.Color('#5a6070')});
+mirror.rotation.x=-Math.PI/2;mirror.position.y=floorY;scene.add(mirror);
+const dim=new THREE.Mesh(new THREE.PlaneGeometry(120,60),new THREE.MeshBasicMaterial({color:'#020309',transparent:true,opacity:.74}));
+dim.rotation.x=-Math.PI/2;dim.position.y=floorY+.005;scene.add(dim);
+const grid=new THREE.GridHelper(120,140,'#1a2040','#0e1226');grid.position.y=floorY+.01;grid.material.transparent=true;grid.material.opacity=.45;scene.add(grid);
+// glowing horizon line behind the name
+const horizon=new THREE.Mesh(new THREE.PlaneGeometry(60,.04),new THREE.MeshBasicMaterial({color:new THREE.Color('#f5c451').multiplyScalar(2.2),toneMapped:false,transparent:true,opacity:.7}));
+horizon.position.set(0,floorY+.02,-6);scene.add(horizon);
+// dust
+{const g=new THREE.BufferGeometry(),n=900,p=new Float32Array(n*3);
+ for(let i=0;i<n;i++){p[i*3]=(rnd()-.5)*70;p[i*3+1]=floorY+rnd()*14;p[i*3+2]=-25+rnd()*30}
+ g.setAttribute('position',new THREE.BufferAttribute(p,3));
+ scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:'#7f8cc8',size:.035,transparent:true,opacity:.6})));}
+
+const font=new Font(await new Promise((res,rej)=>new TTFLoader().load('./font.otf',res,undefined,rej)));
+const mk=(s,size)=>{const g=new TextGeometry(s,{font,size,depth:.32,curveSegments:10,bevelEnabled:true,bevelThickness:.045,bevelSize:.028,bevelSegments:4});g.computeBoundingBox();return g};
+const gA=mk('SAGAR ',1.0),gB=mk('KONKANAGAON',1.0);
+const wA=gA.boundingBox.max.x-gA.boundingBox.min.x,wB=gB.boundingBox.max.x-gB.boundingBox.min.x;
+const total=wA+wB+.55;
+const chrome=new THREE.MeshStandardMaterial({color:'#e9edf5',metalness:1,roughness:.24});
+const goldM=new THREE.MeshStandardMaterial({color:'#f5c451',metalness:1,roughness:.26});
+const name=new THREE.Group();scene.add(name);
+const mA=new THREE.Mesh(gA,chrome);mA.position.x=-total/2;
+const mB=new THREE.Mesh(gB,goldM);mB.position.x=-total/2+wA+.55;
+name.add(mA,mB);name.position.set(0,floorY+.02,0);
+// edge glow strip under letters
+const under=new THREE.Mesh(new THREE.PlaneGeometry(total*1.05,.035),new THREE.MeshBasicMaterial({color:new THREE.Color('#ffe7a8').multiplyScalar(2.5),toneMapped:false}));
+under.position.set(0,floorY+.012,.45);under.rotation.x=-Math.PI/2;scene.add(under);
+
+// ----- tech stack tiles: each tool feeds its own stream into the name -----
+const TECH=[['SPARK','#ff7a45'],['KAFKA','#e2e8f0'],['DATABRICKS','#ff5a4e'],['DELTA LAKE','#3dd6f5'],['AIRFLOW','#5aa9ff'],['BIGQUERY','#7aa7ff'],['PYTHON','#ffd25e'],['SQL','#5eead4'],['HADOOP','#c4a3ff']];
+const tiles=[];const tilesEl=document.getElementById('tiles');
+TECH.forEach(([label,c],i)=>{
+  const f=i/(TECH.length-1)-.5;
+  const g=new THREE.Group();g.position.set(f*22.5,1.75+Math.cos(f*Math.PI)*.55,-5-Math.abs(f)*2.5);
+  g.lookAt(0,1.2,16);
+  const col=new THREE.Color(c);
+  const plate=new THREE.Mesh(new THREE.PlaneGeometry(2.0,.6),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(.09),transparent:true,opacity:.9,depthWrite:false}));
+  const edge=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(2.0,.6)),new THREE.LineBasicMaterial({color:col.clone().multiplyScalar(1.6),toneMapped:false}));
+  const bar=new THREE.Mesh(new THREE.PlaneGeometry(2.0,.045),new THREE.MeshBasicMaterial({color:col.clone().multiplyScalar(2.2),toneMapped:false}));bar.position.y=-.3;
+  g.add(plate,edge,bar);scene.add(g);
+  const el=document.createElement('div');el.className='tile';el.textContent=label;el.style.color=c;tilesEl.appendChild(el);
+  tiles.push({g,col,el,edge,bar,base:col.clone()});
+});
+// ----- data particles that stream in and fuse into the letters -----
+name.updateMatrixWorld(true);
+const targets=[];
+[[mA,1600],[mB,2600]].forEach(([m,n])=>{
+  const s=new MeshSurfaceSampler(m).build(),p=new THREE.Vector3(),nn=new THREE.Vector3();
+  for(let i=0;i<n;i++){s.sample(p,nn);if(nn.z<.5){i--;continue}targets.push(p.clone().applyMatrix4(m.matrixWorld).add(new THREE.Vector3(0,0,.04)))}
+});
+const N=targets.length;
+const parts=[];
+const rawCols=['#a855f7','#ef4444','#38bdf8','#f472b6','#94a3b8','#2dd4bf'].map(c=>new THREE.Color(c));
+const gold=new THREE.Color('#ffd27a'),white=new THREE.Color('#fff6e0');
+for(let i=0;i<N;i++){
+  const tg=targets[i];
+  // pick a tile, biased to the nearer ones so streams fan out naturally
+  let ti=Math.floor(rnd()*TECH.length);if(rnd()<.55){const fx=cl((tg.x/ (total/2))*.5+.5);ti=Math.round(fx*(TECH.length-1)+(rnd()-.5)*3);ti=Math.max(0,Math.min(TECH.length-1,ti));}
+  const tp=tiles[ti].g.position;
+  const src=new THREE.Vector3(tp.x+(rnd()-.5)*1.4,tp.y-.32,tp.z);
+  const ctrl=new THREE.Vector3((tp.x+tg.x)/2+(rnd()-.5)*.8,Math.max(tp.y,tg.y)+.9+rnd()*.5,(tp.z+tg.z)/2+1.5+rnd()*.6);
+  parts.push({tg,src,ctrl,ph:rnd(),col:tiles[ti].col,ti});
+}
+const pg=new THREE.BufferGeometry();
+const pos=new Float32Array(N*3),col=new Float32Array(N*3);
+pg.setAttribute('position',new THREE.BufferAttribute(pos,3));pg.setAttribute('color',new THREE.BufferAttribute(col,3));
+const dot=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,0,32,32,32);
+  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(255,255,255,.8)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
+const pts=new THREE.Points(pg,new THREE.PointsMaterial({size:.14,map:dot,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));
+scene.add(pts);
+// sparks rising off the letters
+const S=500,sg=new THREE.BufferGeometry(),spos=new Float32Array(S*3),scol=new Float32Array(S*3),sp=[];
+for(let i=0;i<S;i++)sp.push({o:targets[Math.floor(rnd()*N)],ph:rnd(),dx:(rnd()-.5)*.8,h:1+rnd()*2});
+sg.setAttribute('position',new THREE.BufferAttribute(spos,3));sg.setAttribute('color',new THREE.BufferAttribute(scol,3));
+const sparks=new THREE.Points(sg,new THREE.PointsMaterial({size:.06,map:dot,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));scene.add(sparks);
+{const ob=mirror.onBeforeRender;mirror.onBeforeRender=function(...a){pts.visible=false;sparks.visible=false;tiles.forEach(t=>t.g.visible=false);ob.apply(this,a);pts.visible=true;sparks.visible=true;tiles.forEach(t=>t.g.visible=true);};}
+
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),.45,.4,.84));
+composer.addPass(new OutputPass());
+
+const gctx=document.getElementById('grain').getContext('2d');
+function grain(){const im=gctx.createImageData(W,H);for(let i=0;i<im.data.length;i+=4){const v=rnd()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}gctx.putImageData(im,0,0)}
+
+const tmp=new THREE.Color(),q=new THREE.Vector3();
+window.renderAt=(t)=>{
+  const ph=t/T;
+  const a=Math.sin(ph*TAU)*.13;
+  camera.position.set(Math.sin(a)*17.5,2.3+Math.sin(ph*TAU*2)*.06,Math.cos(a)*17.5);
+  camera.lookAt(0,-1.0,0);camera.updateMatrixWorld();
+  updateEnv(ph);
+  for(let i=0;i<N;i++){
+    const p=parts[i];const u=mod(ph*2+p.ph,1); // two full cycles per loop
+    const k=cl(u/.72);const e=1-Math.pow(1-k,2.2);
+    // quadratic bezier src -> ctrl -> target
+    const A=p.src,B=p.ctrl,C=p.tg,o=1-e;
+    q.set(o*o*A.x+2*o*e*B.x+e*e*C.x,o*o*A.y+2*o*e*B.y+e*e*C.y,o*o*A.z+2*o*e*B.z+e*e*C.z);
+    let br;
+    if(u<.72){tmp.copy(p.col).lerp(gold,sm((k-.6)/.4));br=(.5+.9*sm(k/.12));}
+    else{const f=(u-.72)/.28;tmp.copy(white).lerp(gold,f);br=1.1*(1-sm(f/.4));}
+    pos[i*3]=q.x;pos[i*3+1]=q.y;pos[i*3+2]=q.z;
+    col[i*3]=tmp.r*br;col[i*3+1]=tmp.g*br;col[i*3+2]=tmp.b*br;
+  }
+  pg.attributes.position.needsUpdate=true;pg.attributes.color.needsUpdate=true;
+  for(let i=0;i<S;i++){const s=sp[i];const u=mod(ph*3+s.ph,1);
+    spos[i*3]=s.o.x+s.dx*u;spos[i*3+1]=s.o.y+u*s.h;spos[i*3+2]=s.o.z+.1;
+    const b=(1-u)*sm(u/.1)*1.2;scol[i*3]=1*b;scol[i*3+1]=.78*b;scol[i*3+2]=.4*b;}
+  sg.attributes.position.needsUpdate=true;sg.attributes.color.needsUpdate=true;
+  tiles.forEach((tl,i)=>{const pu=.5+.5*Math.sin(ph*TAU*2-i*.7);tl.edge.material.color.copy(tl.base).multiplyScalar(1.1+pu*1.4);tl.bar.material.color.copy(tl.base).multiplyScalar(1.4+pu*2);
+    tl.g.updateMatrixWorld();const v=tl.g.position.clone().project(camera);tl.el.style.left=((v.x+1)/2*W)+'px';tl.el.style.top=((1-v.y)/2*H-1)+'px';tl.el.style.opacity=.75+pu*.25;});
+  const cu=sm(t/1.4);const pad=n=>String(n).padStart(2,'0');
+  document.getElementById('S1').textContent=pad(Math.round(5*cu));document.getElementById('S2').textContent=Math.round(300*cu)+'+';
+  document.getElementById('S3').textContent=pad(Math.round(4*cu));document.getElementById('S4').textContent=pad(Math.round(4*cu));
+  horizon.material.opacity=.55+.25*Math.sin(ph*TAU*2);
+  composer.render();grain();
+};
+window.ready=true;window.renderAt(0);
+</script>
+</body></html>
