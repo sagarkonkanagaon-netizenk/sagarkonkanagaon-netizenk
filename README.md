@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source srcset="assets/banner.avif" type="image/avif">
-    <img src="assets/banner.webp" width="100%" alt="Animated cinematic banner: the camera slowly pushes into an impossible data architecture. Silver highways spiral through floating islands, waterfalls pour off the platforms, light pulses race along the roads, and a glowing crystal core sends out scan rings. Chaotic amber ruins sit on the left and an ordered ice-blue city on the right. Text: Sagar Konkanagaon, Senior Data Engineer, Architecting intelligence from chaos.">
+    <img src="assets/banner.webp" width="100%" alt="Animated cinematic banner of an impossible data architecture: waterfalls pour off floating platforms and off the giant S and K structures, lava falls glow on the chaotic amber left, flying cars and hovering craft cross the sky, the moon slowly turns, and the crystal core pulses with scan rings. Text: Sagar Konkanagaon, Senior Data Engineer, Architecting intelligence from chaos.">
   </picture>
 </p>
 
@@ -63,10 +63,47 @@ Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-comme
 
 <img src="assets/h-stack.svg" width="100%" alt="05 Toolbox">
 
-<img src="assets/stack.svg" width="100%" alt="Toolbox. Languages: Python, SQL, PySpark, Shell. Big data: Apache Spark, Kafka, Hadoop, HDFS, YARN, Hive, Sqoop. Lakehouse and warehouse: Databricks, Delta Lake, BigQuery. Orchestration and cloud: Airflow, Azure, Docker, Linux. DevOps and tooling: Git, GitHub Actions, Jira.">
+<p align="center"><sub><b>LANGUAGES</b></sub><br/>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/SQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="SQL">
+  <img src="https://img.shields.io/badge/PySpark-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white" alt="PySpark">
+  <img src="https://img.shields.io/badge/Shell%20Script-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white" alt="Shell Script">
+</p>
+
+<p align="center"><sub><b>BIG DATA AND HADOOP ECOSYSTEM</b></sub><br/>
+  <img src="https://img.shields.io/badge/Apache%20Spark-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white" alt="Apache Spark">
+  <img src="https://img.shields.io/badge/Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white" alt="Kafka">
+  <img src="https://img.shields.io/badge/Apache%20Hadoop-66CCFF?style=for-the-badge&logo=apachehadoop&logoColor=black" alt="Apache Hadoop">
+  <img src="https://img.shields.io/badge/HDFS-2C3E50?style=for-the-badge" alt="HDFS">
+  <img src="https://img.shields.io/badge/YARN-2C3E50?style=for-the-badge" alt="YARN">
+  <img src="https://img.shields.io/badge/Apache%20Hive-FDEE21?style=for-the-badge&logo=apachehive&logoColor=black" alt="Apache Hive">
+  <img src="https://img.shields.io/badge/Sqoop-4A5568?style=for-the-badge" alt="Sqoop">
+</p>
+
+<p align="center"><sub><b>LAKEHOUSE AND WAREHOUSE</b></sub><br/>
+  <img src="https://img.shields.io/badge/Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white" alt="Databricks">
+  <img src="https://img.shields.io/badge/Delta%20Lake-00ADD4?style=for-the-badge&logo=delta&logoColor=white" alt="Delta Lake">
+  <img src="https://img.shields.io/badge/BigQuery-669DF6?style=for-the-badge&logo=googlebigquery&logoColor=white" alt="BigQuery">
+</p>
+
+<p align="center"><sub><b>ORCHESTRATION AND CLOUD</b></sub><br/>
+  <img src="https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white" alt="Airflow">
+  <img src="https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white" alt="Azure">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux">
+</p>
+
+<p align="center"><sub><b>DEVOPS AND TOOLING</b></sub><br/>
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git">
+  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions">
+  <img src="https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=jira&logoColor=white" alt="Jira">
+</p>
 
 <p align="center">
-  <img src="assets/footer.svg" width="100%" alt="Let's build data people trust. Open to Senior Data Engineer roles.">
+  <picture>
+    <source srcset="assets/footer.avif" type="image/avif">
+    <img src="assets/footer.webp" width="100%" alt="Animated footer banner: waterfalls pour from floating platforms into the clouds while light runs along silver highways. Text: Let's build data people trust. Open to Senior Data Engineer roles.">
+  </picture>
 </p>
 
 <p align="center">
