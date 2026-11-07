@@ -1,0 +1,326 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#000;overflow:hidden}
+  #wrap{position:relative;overflow:hidden;font-family:'Inter Display',Inter,'Segoe UI',Helvetica,Arial,sans-serif}
+  canvas{display:block}
+  .vig{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 70% 90% at 52% 50%,rgba(0,0,0,0) 55%,rgba(1,2,6,.7) 100%),
+               linear-gradient(90deg,rgba(2,3,8,.6) 0%,rgba(2,3,8,0) 16%,rgba(2,3,8,0) 84%,rgba(2,3,8,.6) 100%)}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.035;mix-blend-mode:overlay;width:100%;height:100%}
+  .id{position:absolute;left:calc(var(--u)*56);top:50%;transform:translateY(-50%)}
+  .mono{width:calc(var(--u)*34);height:calc(var(--u)*34);margin-bottom:calc(var(--u)*16);display:block}
+  .name{margin:0;font-weight:800;font-size:calc(var(--u)*42);letter-spacing:calc(var(--u)*3.2);line-height:1;white-space:nowrap;
+    background:linear-gradient(180deg,#ffffff 0%,#e9eef7 45%,#aeb8c8 100%);-webkit-background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 calc(var(--u)*10) rgba(140,220,255,.16))}
+  .role{margin:calc(var(--u)*14) 0 0;font:600 calc(var(--u)*11.5) 'JetBrains Mono',Consolas,monospace;letter-spacing:calc(var(--u)*6.5);color:#7fe3f0;display:flex;align-items:center;gap:calc(var(--u)*12)}
+  .role i{display:block;width:calc(var(--u)*30);height:1px;background:linear-gradient(90deg,#7fe3f0,rgba(127,227,240,0))}
+  .tag{margin:calc(var(--u)*22) 0 0;font-weight:500;font-size:calc(var(--u)*17);letter-spacing:calc(var(--u)*2.4);color:#c9d1e0;white-space:nowrap}
+  .tag b{font-weight:700;color:#fff}
+  .tag span{color:#f2b766;font-weight:700}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<div id="wrap">
+  <div class="vig"></div>
+  <div id="flash" style="position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse 40% 90% at 50% 45%,#fff 0%,#ffe7b0 25%,rgba(120,160,255,.5) 55%,rgba(0,0,0,0) 80%)"></div>
+  <canvas class="grain" id="grain"></canvas>
+  <div class="id" style="display:none">
+    <svg class="mono" viewBox="0 0 64 64" fill="none">
+      <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset=".55" stop-color="#9aa6b8"/><stop offset="1" stop-color="#5d6878"/></linearGradient></defs>
+      <path d="M32 2 L58 17 V47 L32 62 L6 47 V17 Z" stroke="url(#mg)" stroke-width="2"/>
+      <path d="M32 7.5 L53.5 20 V44 L32 56.5 L10.5 44 V20 Z" stroke="#7fe3f0" stroke-opacity=".35" stroke-width="1"/>
+      <path d="M29 21 H19.5 L17 23.5 V30 L19.5 32.5 H26.5 L29 35 V40.5 L26.5 43 H17" stroke="url(#mg)" stroke-width="3.2" stroke-linecap="square"/>
+      <path d="M35 21 V43 M35 32 L46 21 M38.5 28.5 L46 43" stroke="url(#mg)" stroke-width="3.2" stroke-linecap="square"/>
+      <circle cx="32" cy="32" r="1.6" fill="#7fe3f0"/>
+    </svg>
+    <h1 class="name">SAGAR KONKANAGAON</h1>
+    <p class="role"><i></i>SENIOR DATA ENGINEER</p>
+    <p class="tag"><b>TURNING CHAOS</b> INTO <span>CLEAN DATA.</span></p>
+  </div>
+</div>
+<div id="blk" style="position:absolute;left:0;top:0;width:100%;height:100%;background:#000;pointer-events:none;opacity:0"></div>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const Q=new URLSearchParams(location.search);
+const W=+(Q.get('w')||1600),H=W/4,U=W/1600,T=12,TAU=Math.PI*2;
+const wrap=document.getElementById('wrap');wrap.style.width=W+'px';wrap.style.height=H+'px';wrap.style.setProperty('--u',(U*1.0)+'px');
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const sm=x=>{x=cl(x);return x*x*(3-2*x)};
+const mod=(a,n)=>((a%n)+n)%n;
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+let sd=21;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+wrap.prepend(renderer.domElement);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color('#03050b');
+scene.fog=new THREE.FogExp2('#050812',.018);
+const pm=new THREE.PMREMGenerator(renderer);
+scene.environment=pm.fromScene(new RoomEnvironment(),.03).texture;
+scene.environmentIntensity=.8;
+const camera=new THREE.PerspectiveCamera(22,4,.1,400);
+
+
+// ================= HOLOGRAPHIC SCENE =================
+scene.background=new THREE.Color('#030614');scene.fog=new THREE.FogExp2('#040818',.022);
+scene.environment=null;
+const add=(m)=>{scene.add(m);return m};
+const AB={transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false};
+const C=(c,k=1)=>new THREE.Color(c).multiplyScalar(k);
+const dotTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,0,32,32,32);
+  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(255,255,255,.8)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
+const ptsMat=(size,op=1)=>new THREE.PointsMaterial({size,map:dotTex,vertexColors:true,opacity:op,...AB});
+
+// floor: faint hex grid + circuit traces
+const floorU={uR:{value:0},uRing:{value:0}};
+{const m=new THREE.ShaderMaterial({...AB,uniforms:floorU,vertexShader:'varying vec3 w;void main(){vec4 p=modelMatrix*vec4(position,1.);w=p.xyz;gl_Position=projectionMatrix*viewMatrix*p;}',
+ fragmentShader:`varying vec3 w;uniform float uR,uRing;
+ float hex(vec2 p){p=abs(p);return max(dot(p,normalize(vec2(1.,1.732))),p.x);}
+ vec4 hx(vec2 uv){vec2 r=vec2(1.,1.732),h=r*.5;vec2 a=mod(uv,r)-h,b=mod(uv-h,r)-h;vec2 g=dot(a,a)<dot(b,b)?a:b;return vec4(g,uv-g);}
+ float h1(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+ void main(){vec2 uv=w.xz*.55;vec4 h=hx(uv);float e=smoothstep(.47,.5,hex(h.xy));
+  float fade=exp(-length(w.xz-vec2(1.5,0.))*.09);
+  vec3 c=vec3(.15,.35,.6)*e*.35*fade;
+  // circuit traces
+  vec2 g=floor(w.xz*1.4);vec2 f=fract(w.xz*1.4);float r=h1(g);
+  float tr=(r>.8?smoothstep(.04,.0,abs(f.y-.5)):0.)+(r<.12?smoothstep(.04,.0,abs(f.x-.5)):0.);
+  c+=vec3(.2,.6,.9)*tr*.25*fade;
+  float d=length(w.xz-vec2(1.6,0.));c*=smoothstep(uR,uR-2.5,d);
+  c+=vec3(.35,.75,1.)*exp(-pow((d-uR)*1.2,2.))*uRing*(.25+e*1.5+tr*2.);
+  gl_FragColor=vec4(c,1.);}`});
+ const f=add(new THREE.Mesh(new THREE.PlaneGeometry(140,80),m));f.rotation.x=-Math.PI/2;f.position.y=-2.2;}
+
+// ---- vortex: spiral light trails ----
+const VX=V(1.6,-1.6,0);
+const NV=16000,vg=new THREE.BufferGeometry(),vp=new Float32Array(NV*3),vc=new Float32Array(NV*3),vd=[];
+const vcols=['#5b6bff','#8a5cff','#3fd0ff','#b071ff','#2a8cff','#d38bff'].map(c=>new THREE.Color(c));
+for(let i=0;i<NV;i++){const arm=i%5;vd.push({arm,u:rnd(),r0:rnd(),jit:(rnd()-.5),h:(rnd()-.5),c:vcols[Math.floor(rnd()*vcols.length)],b:.4+rnd()*.9})}
+vg.setAttribute('position',new THREE.BufferAttribute(vp,3));vg.setAttribute('color',new THREE.BufferAttribute(vc,3));
+add(new THREE.Points(vg,ptsMat(.075)));
+// ---- crystal hologram core ----
+const crystal=new THREE.Group();crystal.position.set(VX.x,-.1,VX.z);add(crystal);
+const cfaceM=new THREE.MeshBasicMaterial({color:C('#3fb8ff',.16),...AB,side:THREE.DoubleSide});
+const cedgeM=new THREE.LineBasicMaterial({color:C('#9ff0ff',1.9),...AB});
+const cedge2=new THREE.LineBasicMaterial({color:C('#b38cff',1.4),...AB,opacity:.8});
+function shard(geo,pos,rot,sc,edgeM){const g=new THREE.Group();g.position.copy(pos);g.rotation.set(...rot);g.scale.setScalar(sc);
+  g.add(new THREE.Mesh(geo,cfaceM));g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),edgeM||cedgeM));crystal.add(g);return g;}
+const shards=[];
+shards.push(shard(new THREE.OctahedronGeometry(1,0),V(0,0,0),[0,.4,0],1.25));
+shards.push(shard(new THREE.OctahedronGeometry(1,0),V(0,.2,0),[.6,0,.5],.95,cedge2));
+for(let i=0;i<16;i++){const a=i/16*TAU+rnd()*.3,r=.55+rnd()*.6,y=(rnd()-.4)*1.5;
+  const geo=rnd()<.5?new THREE.ConeGeometry(.22,.9+rnd()*.9,4,1):new THREE.TetrahedronGeometry(.35+rnd()*.3,0);
+  const s=shard(geo,V(Math.cos(a)*r,y,Math.sin(a)*r),[rnd()*.9-.45+(y>0?0:Math.PI),a,rnd()*.9-.45],.9+rnd()*.5,i%3?cedgeM:cedge2);shards.push(s);}
+// inner engraved detail: wireframe geodesic + rings
+crystal.add(new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(.62,1)),new THREE.LineBasicMaterial({color:C('#7fe3ff',1.2),...AB,opacity:.55})));
+const coreSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:C('#7fe8ff',1.0),...AB}));coreSpr.scale.set(2.2,2.2,1);crystal.add(coreSpr);
+const coreSpr2=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:C('#3a7dff',.3),...AB}));coreSpr2.scale.set(7,7,1);crystal.add(coreSpr2);
+// orange nodes on the crystal
+const nodeP=[];for(let i=0;i<10;i++){const a=rnd()*TAU,y=(rnd()-.5)*1.6,r=.6+rnd()*.5;nodeP.push(V(Math.cos(a)*r,y,Math.sin(a)*r))}
+const ng=new THREE.BufferGeometry().setFromPoints(nodeP);ng.setAttribute('color',new THREE.BufferAttribute(new Float32Array(nodeP.length*3).fill(1),3));
+const nodePts=new THREE.Points(ng,new THREE.PointsMaterial({size:.24,map:dotTex,color:C('#ff7a5c',2.2),...AB}));crystal.add(nodePts);
+
+const dcubes=[];
+// ---- glass grid platforms ----
+const plats=[];
+function platform(x,z,s,y){const g=new THREE.Group();g.position.set(x,y,z);
+  for(let L=0;L<2;L++){const yy=-L*.18;
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(s,s),new THREE.MeshBasicMaterial({color:C(L?'#4a3bd6':'#5f78ff',L?.09:.06),...AB,side:THREE.DoubleSide}));face.rotation.x=-Math.PI/2;face.position.y=yy;g.add(face);
+    const gp=[];const n=5;for(let k=0;k<=n;k++){const t=-s/2+k*s/n;gp.push(V(t,yy,-s/2),V(t,yy,s/2),V(-s/2,yy,t),V(s/2,yy,t));}
+    g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(gp),new THREE.LineBasicMaterial({color:C(L?'#8a7dff':'#8fd8ff',L?1.0:1.5),...AB,opacity:L?.6:.9})));
+    // a few lit cells
+    for(let k=0;k<3;k++){const cx=Math.floor(rnd()*n),cz=Math.floor(rnd()*n);const cell=new THREE.Mesh(new THREE.PlaneGeometry(s/n*.92,s/n*.92),new THREE.MeshBasicMaterial({color:C(rnd()<.5?'#6a5cff':'#3fb8ff',.55),...AB}));
+      cell.rotation.x=-Math.PI/2;cell.position.set(-s/2+(cx+.5)*s/n,yy+.003,-s/2+(cz+.5)*s/n);g.add(cell);}
+  }
+  // light beam below
+  const beam=new THREE.Mesh(new THREE.CylinderGeometry(s*.35,s*.75,y+2.2,24,1,true),new THREE.ShaderMaterial({...AB,side:THREE.DoubleSide,uniforms:{},
+    vertexShader:'varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'varying vec2 v;void main(){float a=pow(v.y,2.2)*.07;gl_FragColor=vec4(vec3(.45,.6,1.)*a,1.);}'}));
+  beam.position.y=-(y+2.2)/2-.18;g.add(beam);
+  add(g);plats.push({g,top:V(x,y+.02,z),s,y0:y,d:Math.hypot(x-1.6,z)});return g;}
+[[-3.2,1.2,2.2,.25],[-1.4,-2.6,2.0,.7],[5.4,-1.8,2.4,.4],[7.6,1.6,2.0,.9],[3.6,2.8,1.8,1.2],[10.2,-1.0,2.0,.6],[-6.0,-1.2,1.8,1.0],[12.4,2.2,1.8,1.3],[9.0,4.4,1.6,1.6],[-4.2,4.0,1.6,1.5]].forEach(a=>platform(...a));
+// ---- golden data arcs (particles flowing) ----
+const arcs=[];const coreTop=V(VX.x,.0,VX.z);
+const pairs=[[0,'c'],[1,'c'],['c',2],['c',3],[4,'c'],[2,5],[6,0],[3,7],[4,8],[9,0],[5,7]];
+pairs.forEach(([a,b])=>{const A=a==='c'?coreTop:plats[a].top,B=b==='c'?coreTop:plats[b].top;
+  const mid=A.clone().add(B).multiplyScalar(.5);mid.y+=1.4+A.distanceTo(B)*.25;arcs.push(new THREE.QuadraticBezierCurve3(A,mid,B));});
+const NA=9000,ag=new THREE.BufferGeometry(),ap=new Float32Array(NA*3),ac=new Float32Array(NA*3),ad=[];
+for(let i=0;i<NA;i++)ad.push({k:i%arcs.length,u:rnd(),o:V((rnd()-.5)*.14,(rnd()-.5)*.14,(rnd()-.5)*.14),sp:1+Math.floor(rnd()*2),b:.5+rnd()*.8});
+ag.setAttribute('position',new THREE.BufferAttribute(ap,3));ag.setAttribute('color',new THREE.BufferAttribute(ac,3));
+add(new THREE.Points(ag,ptsMat(.05)));
+const gold=new THREE.Color('#ffc46b'),goldW=new THREE.Color('#fff0c8');
+// ---- floating wireframe primitives (data cubes, spheres, pyramids) ----
+const prims=[];
+function prim(geo,c,pos,sc){const g=new THREE.Group();g.position.copy(pos);g.scale.setScalar(sc);
+  g.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:C(c,.28),...AB})));
+  g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo),new THREE.LineBasicMaterial({color:C(c,2.0),...AB})));add(g);prims.push({g,base:pos.clone(),ph:rnd(),d:Math.hypot(pos.x-1.6,pos.z)});}
+const cube=new THREE.BoxGeometry(1,1,1),sph=new THREE.IcosahedronGeometry(.6,1),pyr=new THREE.TetrahedronGeometry(.7,0);
+[[cube,'#3f8cff',V(-2.6,1.5,1.4),.42],[sph,'#3fe08a',V(6.2,1.2,-1.0),.55],[pyr,'#ffc46b',V(-1.0,1.2,2.8),.55],[cube,'#3fe08a',V(4.2,.9,2.2),.3],[sph,'#ffc46b',V(9.4,1.6,.8),.42],
+ [cube,'#5b8cff',V(8.4,2.4,-2.2),.32],[pyr,'#3fe08a',V(11.4,1.6,-1.6),.45],[cube,'#3f8cff',V(-5.0,1.4,2.2),.3],[sph,'#3fe08a',V(2.8,2.2,-3.2),.4],[cube,'#ffc46b',V(13.6,2.4,1.2),.28]].forEach(a=>prim(...a));
+// ---- holographic data cubes in a row (ref 2) ----
+for(let i=0;i<6;i++){const s=.34+i*.06;const g=new THREE.Group();g.position.set(6.6+i*1.05,-1.9+s/2,2.6+i*.15);
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(s,s,s),new THREE.MeshBasicMaterial({color:C('#3fd0ff',.2),...AB})));
+  g.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(s,s,s)),new THREE.LineBasicMaterial({color:C('#8ff0ff',1.6),...AB})));
+  // text-like rows inside
+  const rows=[];for(let r=0;r<6;r++){const y=-s*.35+r*s*.14;rows.push(V(-s*.38,y,s*.5+.001),V(-s*.38+s*(.3+((r*7+i*3)%5)*.1),y,s*.5+.001))}
+  g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(rows),new THREE.LineBasicMaterial({color:C('#bff6ff',1.1),...AB,opacity:.7})));add(g);dcubes.push({g,d:Math.hypot(g.position.x-1.6,g.position.z),y0:g.position.y});}
+// ---- sparks ----
+const NSP=160,spg=new THREE.BufferGeometry(),spp=new Float32Array(NSP*3),spc=new Float32Array(NSP*3),spd=[];
+for(let i=0;i<NSP;i++){spd.push({p:V(-8+rnd()*24,-1.8+rnd()*5,-5+rnd()*9),ph:rnd(),c:rnd()<.6?new THREE.Color('#ff7a4a'):new THREE.Color('#5fe6ff')})}
+spg.setAttribute('position',new THREE.BufferAttribute(spp,3));spg.setAttribute('color',new THREE.BufferAttribute(spc,3));
+add(new THREE.Points(spg,ptsMat(.13)));
+
+// ================= ORIGINAL DATA GAUNTLET =================
+scene.add(camera);
+const envTex=pm.fromScene(new RoomEnvironment(),.04).texture;
+const armor=new THREE.MeshStandardMaterial({color:'#151a28',metalness:.9,roughness:.35,envMap:envTex,envMapIntensity:.45,transparent:true});
+const armor2=new THREE.MeshStandardMaterial({color:'#232a40',metalness:.9,roughness:.28,envMap:envTex,envMapIntensity:.55,transparent:true});
+const trim=new THREE.MeshStandardMaterial({color:'#b8853c',metalness:1,roughness:.3,envMap:envTex,envMapIntensity:.7,transparent:true});
+const seam=new THREE.LineBasicMaterial({color:C('#6fe0ff',1.4),...AB});
+const gMats=[armor,armor2,trim];
+const key=new THREE.DirectionalLight('#fff3e0',2.6);key.position.set(-4,5,4);camera.add(key);
+const rimX=0;const rim=new THREE.DirectionalLight('#5fd8ff',3.4);rim.position.set(5,2,-12);camera.add(rim);
+const rim2=new THREE.DirectionalLight('#9a6bff',1.6);rim2.position.set(-6,-1,-10);camera.add(rim2);
+const G=new THREE.Group();G.position.set(.15,-.2,-4.6);G.rotation.z=-.38;camera.add(G);
+const hand=new THREE.Group();G.add(hand);hand.rotation.set(-.12,.55,-.08);
+const M=(geo,mat,x,y,z,p=hand)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);p.add(m);return m};
+// forearm + cuff
+M(new THREE.CylinderGeometry(.43,.55,2.6,40),armor,0,-1.6,0);
+[-.42,-.62,-1.9].forEach((y,k)=>{const r=M(new THREE.TorusGeometry(k==2?.5:.45,.035,10,48),trim,0,y,0);r.rotation.x=Math.PI/2;});
+for(let k=0;k<6;k++){const a=k/6*TAU;const pl=M(new RoundedBoxGeometry(.2,.9,.06,2,.02),armor2,Math.sin(a)*.47,-1.2,Math.cos(a)*.47);pl.rotation.y=a;pl.rotation.x=Math.cos(a)*.05;}
+{const pts=[];for(let k=0;k<6;k++){const a=k/6*TAU+TAU/12;pts.push(V(Math.sin(a)*.475,-.75,Math.cos(a)*.475),V(Math.sin(a)*.5,-1.75,Math.cos(a)*.5));}hand.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),seam));}
+// palm block + back plate
+M(new RoundedBoxGeometry(.96,1.0,.32,4,.12),armor,0,.2,0);
+const plate=M(new RoundedBoxGeometry(.82,.62,.09,3,.035),armor2,0,.27,.19);
+M(new RoundedBoxGeometry(.86,.07,.1,2,.03),trim,0,.6,.2);M(new RoundedBoxGeometry(.6,.05,.1,2,.02),trim,0,-.06,.2);
+// plate circuit seams
+{const pts=[];[-.3,-.15,0,.15,.3].forEach(x=>{pts.push(V(x,.0,.24),V(x,.12,.24));});pts.push(V(-.36,.0,.24),V(.36,.0,.24));hand.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),seam));}
+// five gems (one per core skill)
+const gemCols=['#3fe4ff','#a070ff','#ffbd4f','#3ff0a2','#ff5f9e'];const gems=[];
+gemCols.forEach((c,i)=>{const x=-.32+i*.16,y=.36+(i==2?.06:0);
+  const bez=M(new THREE.TorusGeometry(.068,.016,8,6),trim,x,y,.245);bez.rotation.z=Math.PI/6;
+  const gm=new THREE.MeshBasicMaterial({color:C(c,0),toneMapped:false});const g=M(new THREE.CylinderGeometry(.058,.058,.05,6),gm,x,y,.25);g.rotation.x=Math.PI/2;g.rotation.y=Math.PI/6;
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:C(c,0),...AB}));sp.position.set(x,y,.3);sp.scale.set(.2,.2,1);hand.add(sp);
+  gems.push({gm,sp,c:new THREE.Color(c)});});
+// fingers
+const FX=[-.34,-.11,.12,.35],FL=[[.44,.3,.24],[.48,.34,.26],[.45,.32,.24],[.36,.26,.2]];
+function finger(x,L,w){const root=new THREE.Group();root.position.set(x,.68,0);hand.add(root);const js=[];let parent=root;
+  M(new THREE.SphereGeometry(w*.55,16,12),armor2,0,0,0,root);
+  L.forEach((l,k)=>{const j=new THREE.Group();if(k>0)j.position.y=L[k-1];parent.add(j);const ww=w*(1-k*.09);
+    M(new RoundedBoxGeometry(ww,l*1.04,ww*.95,3,ww*.3),armor,0,l/2,0,j);
+    M(new RoundedBoxGeometry(ww*.72,l*.62,.04,2,.015),k==0?trim:armor2,0,l/2,ww*.49,j);
+    if(k<2)M(new THREE.SphereGeometry(ww*.5,12,10),armor2,0,l,0,j);
+    js.push(j);parent=j;});
+  const tip=new THREE.Object3D();tip.position.y=L[2];js[2].add(tip);return {js,tip};}
+const fingers=FX.map((x,i)=>finger(x,FL[i],.2-(i==3?.025:0)));
+const poseRelax=[[-.25,-.35,-.25],[-.3,-.4,-.3],[-.35,-.45,-.3],[-.4,-.5,-.35]];
+const posePre=[[-.2,-.25,-.15],[-.62,-.75,-.45],[-1.35,-1.5,-.95],[-1.4,-1.55,-1.0]];
+const posePost=[[-.28,-.3,-.2],[-1.5,-1.45,-.95],[-1.35,-1.5,-.95],[-1.4,-1.55,-1.0]];
+// thumb
+const thumbRoot=new THREE.Group();thumbRoot.position.set(-.46,-.02,-.12);hand.add(thumbRoot);
+M(new THREE.SphereGeometry(.15,16,12),armor2,0,0,0,thumbRoot);
+const thumbSeg=[];const TL=[.5,.36,.28];{let parent=thumbRoot,acc=0;TL.forEach((l,k)=>{const j=new THREE.Group();j.position.y=k?TL[k-1]:0;parent.add(j);const ww=.21-k*.02;
+  M(new RoundedBoxGeometry(ww,l*1.04,ww*.95,3,ww*.3),armor,0,l/2,0,j);M(new RoundedBoxGeometry(ww*.7,l*.6,.04,2,.015),k==1?trim:armor2,0,l/2,ww*.49,j);thumbSeg.push(j);parent=j;});}
+const thumbTip=new THREE.Object3D();thumbTip.position.y=TL[2];thumbSeg[2].add(thumbTip);
+function setFingers(P){fingers.forEach((f,i)=>f.js.forEach((j,k)=>j.rotation.x=P[i][k]));}
+const _a=new THREE.Vector3(),_b=new THREE.Vector3(),_q=new THREE.Quaternion(),Y=V(0,1,0);
+function midTipLocal(P){setFingers(P);hand.updateMatrixWorld(true);fingers[1].tip.getWorldPosition(_a);return hand.worldToLocal(_a.clone());}
+camera.position.set(0,0,0);camera.updateMatrixWorld();
+const preTip=midTipLocal(posePre);
+const tRelax=V(-.25,.75,-.55),tPre=preTip.clone().add(V(-.02,-.02,-.06)),tPost=preTip.clone().add(V(-.28,.12,.05));
+const thumbBend=[.0,-.18,-.12];
+function aimThumb(target,bend){const d=target.clone().sub(thumbRoot.position);const len=d.length();
+  _q.setFromUnitVectors(Y,d.normalize());thumbRoot.quaternion.copy(_q);const s=len/(TL[0]+TL[1]+TL[2])*1.04;thumbRoot.scale.set(1,s,1);
+  thumbSeg.forEach((j,k)=>j.rotation.z=bend[k]);}
+const lerpP=(A,B,u)=>A.map((r,i)=>r.map((v,k)=>v+(B[i][k]-v)*u));
+// snap fx
+const ringTex=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');const g=x.createRadialGradient(128,128,70,128,128,128);
+  g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.72,'rgba(255,255,255,.0)');g.addColorStop(.86,'rgba(255,255,255,1)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,256,256);return new THREE.CanvasTexture(c)})();
+const flashSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex,color:C('#fff2d0',0),...AB}));G.add(flashSpr);
+const ringSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:ringTex,color:C('#9fe8ff',0),...AB}));G.add(ringSpr);
+const ringSpr2=new THREE.Sprite(new THREE.SpriteMaterial({map:ringTex,color:C('#ffc46b',0),...AB}));G.add(ringSpr2);
+const ND=2400,dg=new THREE.BufferGeometry(),dp=new Float32Array(ND*3),dc=new Float32Array(ND*3),dd=[];
+for(let i=0;i<ND;i++){const a=rnd()*TAU,b=Math.acos(2*rnd()-1);dd.push({o:V((rnd()-.5)*1.0,-1.6+rnd()*3.0,(rnd()-.5)*.6),v:V(Math.sin(b)*Math.cos(a),Math.sin(b)*Math.sin(a)*.7,Math.cos(b)*.5).multiplyScalar(.6+rnd()*2.2),c:rnd()<.7?gold:new THREE.Color(gemCols[i%5])});}
+dg.setAttribute('position',new THREE.BufferAttribute(dp,3));dg.setAttribute('color',new THREE.BufferAttribute(dc,3));
+const dust=new THREE.Points(dg,ptsMat(.035));G.add(dust);
+
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),.75,.5,.2));
+composer.addPass(new OutputPass());
+const gc=document.getElementById('grain');gc.width=W/2;gc.height=H/2;const gx=gc.getContext('2d');
+function grain(){const im=gx.createImageData(gc.width,gc.height);for(let i=0;i<im.data.length;i+=4){const v=rnd()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}gx.putImageData(im,0,0)}
+const q=new THREE.Vector3(),tc=new THREE.Color();
+window.renderAt=(t)=>{
+  const ph=t/T;
+  const yaw=Math.sin(ph*TAU)*.03;
+  camera.position.set(3.6+Math.sin(yaw)*24,9.6+Math.sin(ph*TAU*2)*.08,Math.cos(yaw)*24);
+  camera.lookAt(3.2,-.3,0);camera.updateMatrixWorld();
+  const SN=2.0;                       // snap moment
+  const B=sm((t-SN-.05)/3.0);         // world build 0..1
+  const sn=sm((t-SN)/.09);            // snap flick
+  // ---- gauntlet ----
+  const gIn=sm(t/.9),gOut=1-sm((t-SN-.1)/.55);
+  G.visible=gOut>.001;
+  if(G.visible){
+    const pre=sm((t-.5)/1.0);
+    setFingers(lerpP(lerpP(poseRelax,posePre,pre),posePost,sn));
+    const tt=tRelax.clone().lerp(tPre,pre).lerp(tPost,sn);aimThumb(tt,thumbBend);
+    G.position.set(.3,-.75+(1-gIn)*-.2,-5.6+(1-gIn)*.5);
+    const shake=t>SN&&t<SN+.25?Math.sin(t*90)*.012*(1-(t-SN)/.25):0;G.position.x+=shake;
+    hand.rotation.y=.95+Math.sin(t*.9)*.04-sn*.05;
+    gMats.forEach(m=>m.opacity=gOut);
+    gems.forEach((g,i)=>{const on=sm((t-.35-i*.2)/.3);const fl=1+1.5*Math.exp(-Math.pow((t-SN-.03)/.12,2));const pulse=1+.15*Math.sin(t*7+i);
+      g.gm.color.copy(g.c).multiplyScalar((.1+on*1.0)*fl*pulse*gOut+.02);g.sp.material.color.copy(g.c).multiplyScalar(on*.35*fl*gOut);});
+    // flash at contact
+    hand.updateMatrixWorld(true);thumbTip.getWorldPosition(_a);G.worldToLocal(_a);
+    const ft=t-SN;const fa=ft>0?Math.exp(-ft*5):0;
+    flashSpr.position.copy(_a);flashSpr.scale.setScalar(.2+ (ft>0?ft*6:0));flashSpr.material.color.set('#fff2d0').multiplyScalar(fa*3);
+    ringSpr.position.copy(_a);ringSpr.scale.setScalar(ft>0?.2+ft*7:0);ringSpr.material.color.set('#9fe8ff').multiplyScalar(ft>0?Math.exp(-ft*3.2)*2:0);
+    ringSpr2.position.copy(_a);ringSpr2.scale.setScalar(ft>0?.1+ft*5:0);ringSpr2.material.color.set('#ffc46b').multiplyScalar(ft>0?Math.exp(-ft*4)*2:0);
+    // dissolve dust
+    const dt=Math.max(0,t-SN-.05);const da=dt>0?sm(dt/.1)*Math.exp(-dt*2.2):0;
+    for(let i=0;i<ND;i++){const d=dd[i];dp[i*3]=d.o.x+d.v.x*dt;dp[i*3+1]=d.o.y+d.v.y*dt+dt*dt*.15;dp[i*3+2]=d.o.z+d.v.z*dt;dc[i*3]=d.c.r*da*1.5;dc[i*3+1]=d.c.g*da*1.5;dc[i*3+2]=d.c.b*da*1.5;}
+    dg.attributes.position.needsUpdate=true;dg.attributes.color.needsUpdate=true;dust.visible=dt>0;
+  }
+  // ---- world build ----
+  const ringR=t>SN?(t-SN)*9:0;floorU.uR.value=Math.max(B*26,ringR);floorU.uRing.value=t>SN?Math.exp(-(t-SN)*.9)*1.6:0;
+  for(let i=0;i<NV;i++){const d=vd[i];const u=mod(d.u+ph*2,1);
+    const r=.9+Math.pow(1-u,1.5)*6.2+d.jit*.25*(1-u);
+    const ang=d.arm/5*TAU + (1-u)*4.2 + t*.9 + d.jit*.25;
+    vp[i*3]=VX.x+Math.cos(ang)*r*1.15;vp[i*3+2]=VX.z+Math.sin(ang)*r*.82;vp[i*3+1]=VX.y+d.h*.25*(1-u)+u*.6;
+    const vis=sm((B*10-r)/1.8);
+    const fade=sm(u/.12)*(1-sm((u-.9)/.1));const b=d.b*fade*(.4+.6*u)*vis*.8;
+    tc.copy(d.c).lerp(new THREE.Color('#8ff0ff'),u*.5);vc[i*3]=tc.r*b;vc[i*3+1]=tc.g*b;vc[i*3+2]=tc.b*b;}
+  vg.attributes.position.needsUpdate=true;vg.attributes.color.needsUpdate=true;
+  const cb=sm(B/.3);crystal.scale.setScalar(Math.max(.001,cb*(1+.25*Math.sin(cb*Math.PI))));
+  crystal.rotation.y=t*.35;crystal.position.y=-.1+Math.sin(t*1.2)*.06;
+  const beat=.5+.5*Math.sin(t*2.4);coreSpr.scale.setScalar(2.0+beat*.4);
+  plats.forEach(p=>{const pb=sm((B*1.25-p.d/16)/.3);p.g.visible=pb>.002;p.g.scale.setScalar(Math.max(.001,pb));p.g.position.y=p.y0-(1-pb)*2.5+Math.sin(t*.8+p.d)*.04*pb;});
+  const arev=cl((B-.3)/.55);
+  for(let i=0;i<NA;i++){const d=ad[i];const u=mod(d.u+t*.12*d.sp,1);arcs[d.k].getPoint(u,q);q.add(d.o);
+    ap[i*3]=q.x;ap[i*3+1]=q.y;ap[i*3+2]=q.z;const b=d.b*sm(u/.08)*(1-sm((u-.92)/.08))*sm((arev-u)/.08);tc.copy(gold).lerp(goldW,Math.sin(u*Math.PI)*.4);
+    ac[i*3]=tc.r*b;ac[i*3+1]=tc.g*b;ac[i*3+2]=tc.b*b;}
+  ag.attributes.position.needsUpdate=true;ag.attributes.color.needsUpdate=true;
+  prims.forEach((p,i)=>{const pb=sm((B*1.25-.15-p.d/16)/.3);p.g.visible=pb>.002;p.g.scale.setScalar(Math.max(.001,pb)*1);p.g.position.y=p.base.y+Math.sin(t*.7+p.ph*TAU)*.12;p.g.rotation.set(t*.5*(i%2?1:-1),t*.6,0)});
+  dcubes.forEach((c,i)=>{const pb=sm((B*1.25-.2-c.d/16)/.25);c.g.visible=pb>.002;c.g.scale.setScalar(Math.max(.001,pb));c.g.rotation.y=Math.sin(t*.6+i)*.15;});
+  for(let i=0;i<NSP;i++){const d=spd[i];const u=mod(d.ph+t*.1,1);spp[i*3]=d.p.x;spp[i*3+1]=d.p.y+u*.6;spp[i*3+2]=d.p.z;const b=Math.sin(u*Math.PI)*1.2*B;spc[i*3]=d.c.r*b;spc[i*3+1]=d.c.g*b;spc[i*3+2]=d.c.b*b}
+  spg.attributes.position.needsUpdate=true;spg.attributes.color.needsUpdate=true;
+  // overlays
+  const fl=t>SN-.02?Math.exp(-Math.max(0,t-SN)*4.5)*sm((t-SN+.02)/.04)*.8:0;document.getElementById('flash').style.opacity=fl;
+  const idA=sm((t-4.6)/1.0);const id=document.querySelector('.id');id.style.opacity=idA;id.style.transform=`translate(${(1-idA)*-14*U}px,-50%)`;
+  document.getElementById('blk').style.opacity=Math.max(1-sm(t/.4),sm((t-(T-.9))/.8));
+  composer.render();grain();
+};
+window.ready=true;window.renderAt(0);
+</script>
+</body></html>
