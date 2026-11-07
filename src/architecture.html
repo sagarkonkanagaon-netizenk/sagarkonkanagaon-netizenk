@@ -1,0 +1,88 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}#wrap{position:relative}canvas{display:block}</style></head>
+<body><div id="wrap"><canvas id="c"></canvas></div>
+<script>
+const T=10,W=2172,H=724;
+const cv=document.getElementById('c');cv.width=W;cv.height=H;
+const gl=cv.getContext('webgl2',{preserveDrawingBuffer:true,antialias:false});
+const vs=`#version 300 es
+in vec2 p;out vec2 uv0;void main(){uv0=p*.5+.5;uv0.y=1.-uv0.y;gl_Position=vec4(p,0,1);}`;
+const fs=`#version 300 es
+precision highp float;in vec2 uv0;out vec4 o;uniform sampler2D img;uniform float ph;uniform vec2 R;
+#define TAU 6.2831853
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<4;i++){s+=a*n(p);p*=2.03;a*=.5;}return s;}
+float L(vec3 c){return dot(c,vec3(.299,.587,.114));}
+vec3 tx(vec2 q){return texture(img,q).rgb;}
+void main(){
+  vec2 uv=uv0;
+  vec2 cc0=vec2(.59,.44);
+  float z=1.+.075*(.5-.5*cos(TAU*ph));
+  vec2 drift=vec2(sin(TAU*ph)*.006,0.);
+  vec2 q=(uv-cc0)/z+cc0+drift;
+  // pseudo-depth parallax: upper sky/far layers move less than near bottom/left
+  float dep=smoothstep(.0,1.,uv.y)*.6+ (1.-smoothstep(0.,.25,uv.x))*.4;
+  q.x+=sin(TAU*ph)*.004*dep;
+  uv=q;
+  vec2 px=uv*R; vec2 d=1./R;
+  vec3 c=tx(uv); float l=L(c); float mx=max(c.r,max(c.g,c.b)),mn=min(c.r,min(c.g,c.b)); float sat=(mx-mn)/(mx+1e-3);
+  float cool=smoothstep(0.,.08,c.b-c.r), warm=smoothstep(0.,.1,c.r-c.b);
+  // ---- clouds: gentle churning (bottom + right haze) ----
+  float cloudM=(1.-smoothstep(.18,.35,sat))*smoothstep(.22,.4,l)*(1.-smoothstep(.85,.95,l))*smoothstep(.55,.8,uv.y);
+  vec2 circ=vec2(cos(TAU*ph),sin(TAU*ph))*1.6;
+  float cn=fbm(px*.006+circ)-.5; c*=1.+cloudM*cn*.32;
+  // ---- waterfalls: vertical bright cool structures flow downward ----
+  float gx=abs(L(tx(uv+vec2(3.*d.x,0)))-L(tx(uv-vec2(3.*d.x,0)))), gy=abs(L(tx(uv+vec2(0,3.*d.y)))-L(tx(uv-vec2(0,3.*d.y))));
+  float vert=smoothstep(.02,.12,gx-gy);
+  float wf=smoothstep(.5,.8,l)*(1.-smoothstep(.35,.6,sat))*vert*step(.25,uv.y);
+  float s1=sin(px.y*.16+n(vec2(px.x*.35,0.))*40.-TAU*6.*ph);
+  float s2=sin(px.y*.07+n(vec2(px.x*.2,7.))*30.-TAU*3.*ph);
+  float flow=.5+.5*s1*.6+.5*s2*.4;
+  c*=1.+wf*(flow-.5)*.75; c+=wf*pow(max(0.,s1),8.)*vec3(.55,.85,1.)*.35;
+  // ---- data running along highways: glints sweep left->right over highlights ----
+  float hm=smoothstep(.45,.85,l);
+  float lane=n(vec2(px.y*.08,3.))*30.;
+  float g1=pow(max(0.,sin(px.x*.045+lane-TAU*5.*ph)),24.);
+  float g2=pow(max(0.,sin(px.x*.011-px.y*.004-TAU*2.*ph)),10.);
+  vec3 gc=mix(vec3(1.,.72,.35),vec3(.45,.9,1.),smoothstep(.3,.6,uv.x));
+  c+=hm*(g1*.55+g2*.35)*gc*(1.-wf);
+  // ---- crystal core pulse ----
+  vec2 cc=vec2(.59,.435); vec2 dv=(uv-cc)*vec2(R.x/R.y,1.); float r=length(dv);
+  float pulse=.5+.5*sin(TAU*2.*ph);
+  float inC=1.-smoothstep(.07,.11,r);
+  c*=1.+inC*hm*(.25+.45*pulse);
+  float ang=atan(dv.y,dv.x);
+  float rays=pow(max(0.,sin(ang*9.+TAU*ph)),6.)*exp(-r*9.);
+  c+=vec3(1.,.78,.42)*(exp(-r*r*260.)*(.18+.22*pulse)+rays*.10*(.6+.4*pulse));
+  // light scan ring expanding from the core
+  float rp=fract(ph*2.); float ring=exp(-pow((r-rp*.45)/.006,2.))*(1.-rp)*.5;
+  c+=ring*vec3(.5,.85,1.)*hm*1.4;
+  // ---- embers rising on the chaotic left, motes on the right ----
+  vec3 add=vec3(0);
+  for(int k=0;k<2;k++){float sc=k==0?55.:30.; vec2 g=px/sc; vec2 id=floor(g);
+    float rr=h(id+float(k)*17.); float sp=floor(1.+rr*3.);
+    vec2 pos=vec2(h(id+3.1)*.8+.1+.08*sin(TAU*(ph+rr)),fract(h(id+9.7)-ph*sp));
+    vec2 f=fract(g); f.y=fract(f.y+ph*sp)- (fract(f.y+ph*sp)-f.y); // keep
+    vec2 pp=vec2(h(id+3.1)*.8+.1+.08*sin(TAU*(ph+rr)), 1.-fract(h(id+9.7)+ph*sp));
+    float dd=length(fract(g)-pp)*sc; float on=step(.55,rr);
+    float tw=.6+.4*sin(TAU*(3.*ph+rr));
+    vec3 col=mix(vec3(1.,.62,.25),vec3(.5,.9,1.),smoothstep(.35,.65,uv.x));
+    add+=col*on*tw*exp(-dd*dd*(k==0?.5:.9))*(k==0?.9:.5);}
+  c+=add*(1.-smoothstep(.3,.75,l))*(1.-step(.03,uv.x)*step(uv.x,.30)*step(.24,uv.y)*step(uv.y,.6));
+  // ---- name shimmer ----
+  vec2 tb=vec2(.03,.295);float inT=step(tb.x,uv.x)*step(uv.x,tb.y)*step(.24,uv.y)*step(uv.y,.6);
+  float txt=inT*smoothstep(.62,.85,l)*(1.-smoothstep(.2,.35,sat));
+  float sw=ph/.35; float bx=mix(-.05,.36,sw); float band=sw<1.?exp(-pow((uv.x-bx+ (uv.y-.4)*.15)/.018,2.)):0.;
+  c+=txt*band*vec3(.75,.92,1.)*.9;
+  o=vec4(c,1.);
+}`;
+function sh(t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);if(!gl.getShaderParameter(x,gl.COMPILE_STATUS))console.log('ERROR '+gl.getShaderInfoLog(x));return x}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+const loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+const im=new Image();im.onload=()=>{const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,im);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+ gl.uniform2f(gl.getUniformLocation(pr,'R'),W,H);window.ready=true;window.renderAt(0);};
+im.src='architecture-still.png';
+window.renderAt=t=>{gl.viewport(0,0,W,H);gl.uniform1f(gl.getUniformLocation(pr,'ph'),(t%T)/T);gl.drawArrays(gl.TRIANGLES,0,3);};
+</script></body></html>
