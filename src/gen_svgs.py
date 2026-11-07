@@ -7,7 +7,7 @@ os.makedirs(OUT, exist_ok=True)
 
 SANS = "'Segoe UI',Inter,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif"
 MONO = "'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
-BG = "#070a18"; CARD = "#0b1126"; GOLD = "#f5c451"; TEAL = "#2dd4bf"
+BG = "#04050b"; CARD = "#0a0c1a"; GOLD = "#f5c451"; TEAL = "#2dd4bf"
 TXT = "#eef1fa"; MUTED = "#98a1c0"; LINE = "#1d2647"
 
 def write(name, body):
@@ -17,7 +17,7 @@ def write(name, body):
 def frame(w, h, inner, extra_defs="", style=""):
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" role="img">
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1430"/><stop offset="1" stop-color="{BG}"/></linearGradient>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0e1024"/><stop offset="1" stop-color="{BG}"/></linearGradient>
   <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{GOLD}" stop-opacity=".55"/><stop offset=".5" stop-color="{TEAL}" stop-opacity=".25"/><stop offset="1" stop-color="{GOLD}" stop-opacity=".1"/></linearGradient>
   <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
   {extra_defs}
@@ -239,4 +239,29 @@ def footer():
     write("footer.svg", frame(W, H, inner))
 
 footer()
+
+# ---------------------------------------------------------------- impact strip
+def impact():
+    W, H = 1200, 150
+    stats = [
+        ("300+", "production pipelines", "migrated at eBay", GOLD),
+        ("5 yrs", "building data platforms", "Spark · Databricks · Airflow", "#c4a3ff"),
+        ("4", "industries", "e-commerce · auto · finance · IoT", "#7cc4ff"),
+        ("4", "things I've shipped", "2 live sites · 2 open source", TEAL),
+    ]
+    cw = (W - 72) / 4
+    parts = []
+    for i, (n, l1, l2, c) in enumerate(stats):
+        x = 36 + i * cw
+        if i:
+            parts.append(f'<line x1="{x:.0f}" y1="34" x2="{x:.0f}" y2="{H-34}" stroke="{LINE}"/>')
+        cx = x + cw / 2
+        d = .25 * i
+        parts.append(f'<g><animate attributeName="opacity" values="0;0;1" keyTimes="0;{d/(d+.8):.2f};1" dur="{d+.8:.2f}s" fill="freeze"/>'
+                     f'<text x="{cx:.0f}" y="72" text-anchor="middle" font-size="40" font-weight="900" fill="{c}" letter-spacing="-1">{esc(n)}</text>'
+                     f'<text x="{cx:.0f}" y="98" text-anchor="middle" font-size="14.5" font-weight="700" fill="{TXT}">{esc(l1)}</text>'
+                     f'<text x="{cx:.0f}" y="118" text-anchor="middle" class="m" font-size="10.5" font-weight="600" letter-spacing="1" fill="{MUTED}">{esc(l2)}</text></g>')
+    write("impact.svg", frame(W, H, "".join(parts)))
+
+impact()
 print("ok")

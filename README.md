@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.webp" width="100%" alt="Animated 3D banner: raw, chaotic records stream through bronze, silver and gold rings and come out as clean gold data. A failed quality check pulls one bad record into quarantine, an orchestration rail pulses underneath, and the gold core feeds BI, APIs and AI.">
+  <img src="assets/banner.webp" width="100%" alt="Animated, ray-traced banner: a black hole whose light-bent accretion disk is made of data. Raw violet records swirl at the outer edge, get cleaned to silver, and fall into a gold core. Sagar Konkanagaon, Senior Data Engineer: all data falls toward one thing, a single source of truth.">
 </p>
 
 <p align="center">
@@ -11,6 +11,8 @@
 
 I build data platforms end to end, from the first byte ingested to the dashboard, API or AI model that uses it, built to be **reliable, observable and easy to trust**.
 Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-commerce, automotive, finance and industrial IoT. Most recently at eBay, migrating **300+ production pipelines**.
+
+<img src="assets/impact.svg" width="100%" alt="300+ production pipelines migrated at eBay · 5 years building data platforms · 4 industries · 4 things shipped: 2 live sites and 2 open-source projects">
 
 <img src="assets/h-work.svg" width="100%" alt="01 Selected work">
 
