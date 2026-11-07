@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.webp" width="100%" alt="Animated 3D banner: Sagar Konkanagaon in giant chrome and gold letters on a mirror floor, forged from streams of data that flow out of glowing tiles for Spark, Kafka, Databricks, Delta Lake, Airflow, BigQuery, Python, SQL and Hadoop. Senior Data Engineer: 5 years, 300+ pipelines migrated, 4 industries, 4 products shipped.">
+  <img src="assets/banner.webp" width="100%" alt="Animated 3D banner: Sagar Konkanagaon in large white-to-gold type above a glowing gold line on a mirror floor, fed by streams of data that flow out of glowing tiles for Spark, Kafka, Databricks, Delta Lake, Airflow, BigQuery, Python, SQL and Hadoop. Senior Data Engineer: 5 years, 300+ pipelines migrated, 4 industries, 4 products shipped.">
 </p>
 
 <p align="center">

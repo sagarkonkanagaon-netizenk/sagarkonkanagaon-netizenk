@@ -24,6 +24,9 @@
   .stat .n{font:900 30px 'Inter Display',Inter,sans-serif;letter-spacing:-1px;color:#fff;font-variant-numeric:tabular-nums}
   .stat .n.g{color:#f5c451}
   .stat .k{font:700 9px 'JetBrains Mono',Consolas,monospace;letter-spacing:2.4px;color:#8b93b0;line-height:1.3}
+  .name{position:absolute;left:0;right:0;top:132px;text-align:center;font-family:'Inter Display',Inter,sans-serif;font-weight:900;font-size:76px;letter-spacing:-2.5px;line-height:1;
+    background:linear-gradient(100deg,#ffffff 0%,#ffffff 36%,#fff3d0 44%,#f5c451 52%,#f5c451 70%,#e3a03a 100%);background-size:220% 100%;-webkit-background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 22px rgba(245,196,81,.25)) drop-shadow(0 6px 18px rgba(0,0,0,.8))}
 </style>
 <script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
 </head><body>
@@ -37,6 +40,7 @@
   <div class="stat l"><div class="row"><span class="n g" id="S1">05</span><span class="k">YEARS<br>BUILDING DATA</span></div><br><div class="row"><span class="n" id="S2">300+</span><span class="k">PIPELINES<br>MIGRATED</span></div></div>
   <div class="stat r"><div class="row"><span class="k">INDUSTRIES<br>E-COM · AUTO · FIN · IoT</span><span class="n" id="S3">04</span></div><br><div class="row"><span class="k">PRODUCTS<br>SHIPPED</span><span class="n g" id="S4">04</span></div></div>
   <div id="tiles"></div>
+  <div class="name" id="NM">Sagar Konkanagaon</div>
   <div class="lb top"><span>INGEST · STORE · TRANSFORM · ORCHESTRATE · TEST · SERVE</span><span>BENGALURU · IN</span></div>
   <div class="lb bot"><span>SPARK · DATABRICKS · DELTA LAKE · AIRFLOW · BIGQUERY · KAFKA · PYTHON · SQL</span><span><i class="live"></i><b>OPEN TO SENIOR DE ROLES</b></span></div>
 </div>
@@ -96,7 +100,7 @@ dim.rotation.x=-Math.PI/2;dim.position.y=floorY+.005;scene.add(dim);
 const grid=new THREE.GridHelper(120,140,'#1a2040','#0e1226');grid.position.y=floorY+.01;grid.material.transparent=true;grid.material.opacity=.45;scene.add(grid);
 // glowing horizon line behind the name
 const horizon=new THREE.Mesh(new THREE.PlaneGeometry(60,.04),new THREE.MeshBasicMaterial({color:new THREE.Color('#f5c451').multiplyScalar(2.2),toneMapped:false,transparent:true,opacity:.7}));
-horizon.position.set(0,floorY+.02,-6);scene.add(horizon);
+horizon.position.set(0,floorY+.02,-6);
 // dust
 {const g=new THREE.BufferGeometry(),n=900,p=new Float32Array(n*3);
  for(let i=0;i<n;i++){p[i*3]=(rnd()-.5)*70;p[i*3+1]=floorY+rnd()*14;p[i*3+2]=-25+rnd()*30}
@@ -107,16 +111,16 @@ const font=new Font(await new Promise((res,rej)=>new TTFLoader().load('./font.ot
 const mk=(s,size)=>{const g=new TextGeometry(s,{font,size,depth:.32,curveSegments:10,bevelEnabled:true,bevelThickness:.045,bevelSize:.028,bevelSegments:4});g.computeBoundingBox();return g};
 const gA=mk('SAGAR ',1.0),gB=mk('KONKANAGAON',1.0);
 const wA=gA.boundingBox.max.x-gA.boundingBox.min.x,wB=gB.boundingBox.max.x-gB.boundingBox.min.x;
-const total=wA+wB+.55;
+const total=(wA+wB+.55)*1.0;
 const chrome=new THREE.MeshStandardMaterial({color:'#e9edf5',metalness:1,roughness:.24});
 const goldM=new THREE.MeshStandardMaterial({color:'#f5c451',metalness:1,roughness:.26});
 const name=new THREE.Group();scene.add(name);
 const mA=new THREE.Mesh(gA,chrome);mA.position.x=-total/2;
 const mB=new THREE.Mesh(gB,goldM);mB.position.x=-total/2+wA+.55;
-name.add(mA,mB);name.position.set(0,floorY+.02,0);
+name.add(mA,mB);name.visible=false;name.position.set(0,floorY+.02,0);
 // edge glow strip under letters
 const under=new THREE.Mesh(new THREE.PlaneGeometry(total*1.05,.035),new THREE.MeshBasicMaterial({color:new THREE.Color('#ffe7a8').multiplyScalar(2.5),toneMapped:false}));
-under.position.set(0,floorY+.012,.45);under.rotation.x=-Math.PI/2;scene.add(under);
+under.position.set(0,floorY+.03,.45);scene.add(under);
 
 // ----- tech stack tiles: each tool feeds its own stream into the name -----
 const TECH=[['SPARK','#ff7a45'],['KAFKA','#e2e8f0'],['DATABRICKS','#ff5a4e'],['DELTA LAKE','#3dd6f5'],['AIRFLOW','#5aa9ff'],['BIGQUERY','#7aa7ff'],['PYTHON','#ffd25e'],['SQL','#5eead4'],['HADOOP','#c4a3ff']];
@@ -136,10 +140,7 @@ TECH.forEach(([label,c],i)=>{
 // ----- data particles that stream in and fuse into the letters -----
 name.updateMatrixWorld(true);
 const targets=[];
-[[mA,1600],[mB,2600]].forEach(([m,n])=>{
-  const s=new MeshSurfaceSampler(m).build(),p=new THREE.Vector3(),nn=new THREE.Vector3();
-  for(let i=0;i<n;i++){s.sample(p,nn);if(nn.z<.5){i--;continue}targets.push(p.clone().applyMatrix4(m.matrixWorld).add(new THREE.Vector3(0,0,.04)))}
-});
+for(let i=0;i<3200;i++){const x=(rnd()-.5)*total*.98;targets.push(new THREE.Vector3(x,floorY+.03+rnd()*.05,.45+(rnd()-.5)*.08));}
 const N=targets.length;
 const parts=[];
 const rawCols=['#a855f7','#ef4444','#38bdf8','#f472b6','#94a3b8','#2dd4bf'].map(c=>new THREE.Color(c));
@@ -196,7 +197,7 @@ window.renderAt=(t)=>{
   }
   pg.attributes.position.needsUpdate=true;pg.attributes.color.needsUpdate=true;
   for(let i=0;i<S;i++){const s=sp[i];const u=mod(ph*3+s.ph,1);
-    spos[i*3]=s.o.x+s.dx*u;spos[i*3+1]=s.o.y+u*s.h;spos[i*3+2]=s.o.z+.1;
+    spos[i*3]=s.o.x+s.dx*u;spos[i*3+1]=s.o.y+u*s.h*.6;spos[i*3+2]=s.o.z+.1;
     const b=(1-u)*sm(u/.1)*1.2;scol[i*3]=1*b;scol[i*3+1]=.78*b;scol[i*3+2]=.4*b;}
   sg.attributes.position.needsUpdate=true;sg.attributes.color.needsUpdate=true;
   tiles.forEach((tl,i)=>{const pu=.5+.5*Math.sin(ph*TAU*2-i*.7);tl.edge.material.color.copy(tl.base).multiplyScalar(1.1+pu*1.4);tl.bar.material.color.copy(tl.base).multiplyScalar(1.4+pu*2);
@@ -204,6 +205,7 @@ window.renderAt=(t)=>{
   const cu=sm(t/1.4);const pad=n=>String(n).padStart(2,'0');
   document.getElementById('S1').textContent=pad(Math.round(5*cu));document.getElementById('S2').textContent=Math.round(300*cu)+'+';
   document.getElementById('S3').textContent=pad(Math.round(4*cu));document.getElementById('S4').textContent=pad(Math.round(4*cu));
+  document.getElementById('NM').style.backgroundPosition=(100-mod(ph,1)*100)+'% 0';
   horizon.material.opacity=.55+.25*Math.sin(ph*TAU*2);
   composer.render();grain();
 };
