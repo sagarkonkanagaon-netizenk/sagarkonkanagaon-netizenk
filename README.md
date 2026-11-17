@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source srcset="assets/banner.avif" type="image/avif">
-    <img src="assets/banner.webp" width="100%" alt="Animated cinematic banner of an impossible data architecture: waterfalls pour off floating platforms and off the giant S and K structures, lava falls glow on the chaotic amber left, flying cars and hovering craft cross the sky, the moon slowly turns, and the crystal core pulses with scan rings. Text: Sagar Konkanagaon, Senior Data Engineer, Architecting intelligence from chaos.">
-  </picture>
+  <img src="assets/banner.webp" width="100%" alt="Animated cinematic banner of an impossible data architecture: waterfalls pour off floating platforms and off the giant S and K structures, lava falls glow on the chaotic amber left, flying cars and hovering craft cross the sky, the moon slowly turns, and the crystal core pulses with scan rings. Text: Sagar Konkanagaon, Senior Data Engineer, Architecting intelligence from chaos.">
 </p>
 
 <p align="center">
@@ -100,10 +97,7 @@ Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-comme
 </p>
 
 <p align="center">
-  <picture>
-    <source srcset="assets/footer.avif" type="image/avif">
-    <img src="assets/footer.webp" width="100%" alt="Animated footer banner: waterfalls pour from floating platforms into the clouds while light runs along silver highways. Text: Let's build data people trust. Open to Senior Data Engineer roles.">
-  </picture>
+  <img src="assets/footer.webp" width="100%" alt="Animated footer banner: waterfalls pour from floating platforms into the clouds while light runs along silver highways. Text: Let's build data people trust. Open to Senior Data Engineer roles.">
 </p>
 
 <p align="center">

@@ -29,16 +29,16 @@ vec3 fall(vec3 c,vec2 px,vec4 r,float a,vec3 c1,vec3 c2,float spd,float mist){
   if(abs(u)>1.||v>1.) return c;
   float edge=1.-smoothstep(.55,1.,abs(u));float top=smoothstep(0.,.05,v);float bot=1.-smoothstep(.85,1.,v);
   float st=fallStreak(px,spd);
-  vec3 wc=mix(c1,c2,st);float al=a*edge*top*bot*(.45+.55*st);
-  return mix(c,wc,al)+c2*pow(st,10.)*edge*top*bot*a*.35;}
+  vec3 wc=mix(c1,c2,st);float al=a*edge*top*bot*(.35+.65*st);
+  return mix(c,wc,al)+c2*pow(st,6.)*edge*top*bot*a*.6;}
 vec3 car(vec3 c,vec2 px,vec2 p0,vec2 p1,float k,float o,float arc,vec3 col,float sz){
   float u=fract(ph*k+o);vec2 dir=normalize(p1-p0);vec2 pos=mix(p0,p1,u)+vec2(0.,-sin(u*3.14159)*arc);
-  float vis=smoothstep(0.,.06,u)*(1.-smoothstep(.94,1.,u));float L=60.*sz;
+  float vis=smoothstep(0.,.06,u)*(1.-smoothstep(.94,1.,u));float L=90.*sz;
   vec2 q=px-pos;float t=clamp(dot(q,-dir)/L,0.,1.);float d=length(q+dir*t*L);
   float trail=exp(-d*d/(1.6*sz*sz))*pow(1.-t,2.);
   float head=exp(-dot(q,q)/(2.2*sz*sz));
   vec2 tl=pos-dir*3.*sz;float tail=exp(-dot(px-tl,px-tl)/(1.2*sz*sz));
-  return c+vis*(trail*col*.9+head*vec3(1.,1.,1.)*1.6+tail*vec3(1.,.15,.1)*.8);}
+  return c+vis*(trail*col*1.4+head*vec3(1.,1.,1.)*2.4+tail*vec3(1.,.15,.1)*1.2);}
 vec3 ship(vec3 c,vec2 px,vec2 p0,vec2 p1,float o,float s){
   float u=fract(ph+o);vec2 pos=mix(p0,p1,u)+vec2(0.,sin(TAU*ph*2.+o*9.)*2.);
   float vis=smoothstep(0.,.08,u)*(1.-smoothstep(.92,1.,u));
@@ -73,7 +73,7 @@ void main(){
   {float lavaM=warm*smoothstep(.3,.65,l)*(1.-smoothstep(.3,.42,uv.x));
    float txtBox=step(.03,uv.x)*step(uv.x,.3)*step(.24,uv.y)*step(uv.y,.6);lavaM*=1.-txtBox;
    vec2 cr=vec2(cos(TAU*ph),sin(TAU*ph));float m=fbm(px*.018+cr*1.5+vec2(0.,ph*0.));
-   c*=1.+lavaM*(m-.45)*1.4;c+=lavaM*vec3(1.,.38,.06)*pow(m,3.)*.9;}
+   c*=1.+lavaM*(m-.45)*2.;c+=lavaM*vec3(1.,.38,.06)*pow(m,2.5)*1.4;}
   // ---- waterfalls: vertical bright cool structures flow downward ----
   float gx=abs(L(tx(uv+vec2(3.*d.x,0)))-L(tx(uv-vec2(3.*d.x,0)))), gy=abs(L(tx(uv+vec2(0,3.*d.y)))-L(tx(uv-vec2(0,3.*d.y))));
   float vert=smoothstep(.02,.12,gx-gy);
@@ -85,30 +85,30 @@ void main(){
 
   // ---- explicit waterfalls (existing ones + new ones pouring off the S and K) ----
   vec3 w1=vec3(.45,.72,.9),w2=vec3(.92,.99,1.);
-  c=fall(c,px,vec4(800.,836.,505.,605.),.8,w1,w2,7.,.9);
-  c=fall(c,px,vec4(1028.,1068.,525.,635.),.8,w1,w2,7.,.9);
-  c=fall(c,px,vec4(1102.,1120.,208.,282.),.7,w1,w2,6.,.4);
-  c=fall(c,px,vec4(1150.,1176.,212.,288.),.7,w1,w2,6.,.4);
-  c=fall(c,px,vec4(1128.,1146.,68.,138.),.65,w1,w2,6.,.3);
-  c=fall(c,px,vec4(1040.,1060.,108.,162.),.6,w1,w2,6.,.3);
-  c=fall(c,px,vec4(1830.,1862.,163.,248.),.8,w1,w2,7.,.6);
-  c=fall(c,px,vec4(1862.,1902.,403.,458.),.75,w1,w2,7.,.6);
-  c=fall(c,px,vec4(1785.,1826.,512.,572.),.8,w1,w2,7.,.7);
-  c=fall(c,px,vec4(1938.,1962.,522.,578.),.8,w1,w2,7.,.6);
-  c=fall(c,px,vec4(2062.,2088.,245.,300.),.6,w1,w2,6.,.4);
+  c=fall(c,px,vec4(800.,836.,505.,605.),0.95,w1,w2,7.,.9);
+  c=fall(c,px,vec4(1028.,1068.,525.,635.),0.95,w1,w2,7.,.9);
+  c=fall(c,px,vec4(1102.,1120.,208.,282.),0.85,w1,w2,6.,.4);
+  c=fall(c,px,vec4(1150.,1176.,212.,288.),0.85,w1,w2,6.,.4);
+  c=fall(c,px,vec4(1128.,1146.,68.,138.),0.80,w1,w2,6.,.3);
+  c=fall(c,px,vec4(1040.,1060.,108.,162.),0.74,w1,w2,6.,.3);
+  c=fall(c,px,vec4(1830.,1862.,163.,248.),0.95,w1,w2,7.,.6);
+  c=fall(c,px,vec4(1862.,1902.,403.,458.),0.91,w1,w2,7.,.6);
+  c=fall(c,px,vec4(1785.,1826.,512.,572.),0.95,w1,w2,7.,.7);
+  c=fall(c,px,vec4(1938.,1962.,522.,578.),0.95,w1,w2,7.,.6);
+  c=fall(c,px,vec4(2062.,2088.,245.,300.),0.74,w1,w2,6.,.4);
   // new: off the underside of the S ribbon and the K arms
-  c=fall(c,px,vec4(1196.,1222.,478.,598.),.85,w1,w2,8.,.9);
-  c=fall(c,px,vec4(905.,925.,330.,450.),.75,w1,w2,8.,.6);
-  c=fall(c,px,vec4(1268.,1290.,300.,420.),.75,w1,w2,8.,.6);
-  c=fall(c,px,vec4(1655.,1678.,445.,560.),.8,w1,w2,8.,.8);
-  c=fall(c,px,vec4(1560.,1580.,250.,360.),.7,w1,w2,8.,.6);
-  c=fall(c,px,vec4(1735.,1752.,560.,660.),.75,w1,w2,8.,.8);
+  c=fall(c,px,vec4(1196.,1222.,478.,598.),0.95,w1,w2,8.,.9);
+  c=fall(c,px,vec4(905.,925.,330.,450.),0.91,w1,w2,8.,.6);
+  c=fall(c,px,vec4(1268.,1290.,300.,420.),0.91,w1,w2,8.,.6);
+  c=fall(c,px,vec4(1655.,1678.,445.,560.),0.95,w1,w2,8.,.8);
+  c=fall(c,px,vec4(1560.,1580.,250.,360.),0.85,w1,w2,8.,.6);
+  c=fall(c,px,vec4(1735.,1752.,560.,660.),0.91,w1,w2,8.,.8);
   // lava falls on the left
   vec3 v1=vec3(.9,.25,.03),v2=vec3(1.,.8,.35);
-  c=fall(c,px,vec4(558.,572.,118.,195.),.85,v1,v2,4.,.7);
-  c=fall(c,px,vec4(452.,464.,105.,165.),.8,v1,v2,4.,.6);
-  c=fall(c,px,vec4(30.,48.,520.,650.),.85,v1,v2,4.,.8);
-  c=fall(c,px,vec4(232.,246.,470.,560.),.8,v1,v2,4.,.8);
+  c=fall(c,px,vec4(558.,572.,118.,195.),0.95,v1,v2,4.,.7);
+  c=fall(c,px,vec4(452.,464.,105.,165.),0.95,v1,v2,4.,.6);
+  c=fall(c,px,vec4(30.,48.,520.,650.),0.95,v1,v2,4.,.8);
+  c=fall(c,px,vec4(232.,246.,470.,560.),0.95,v1,v2,4.,.8);
   // ---- flying cars and craft ----
   c=car(c,px,vec2(1180.,40.),vec2(1500.,14.),1.,.0,10.,vec3(.4,.85,1.),1.);
   c=car(c,px,vec2(2172.,62.),vec2(1550.,120.),1.,.35,8.,vec3(.8,.95,1.),1.2);
@@ -128,7 +128,7 @@ void main(){
   float g1=pow(max(0.,sin(px.x*.045+lane-TAU*5.*ph)),24.);
   float g2=pow(max(0.,sin(px.x*.011-px.y*.004-TAU*2.*ph)),10.);
   vec3 gc=mix(vec3(1.,.72,.35),vec3(.45,.9,1.),smoothstep(.3,.6,uv.x));
-  c+=hm*(g1*.55+g2*.35)*gc*(1.-wf);
+  c+=hm*(g1*.8+g2*.5)*gc*(1.-wf);
   // ---- crystal core pulse ----
   vec2 cc=vec2(.59,.435); vec2 dv=(uv-cc)*vec2(R.x/R.y,1.); float r=length(dv);
   float pulse=.5+.5*sin(TAU*2.*ph);
