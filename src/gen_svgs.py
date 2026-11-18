@@ -98,9 +98,6 @@ deja_motif = f"""
 card("foundry", "LIVE · INTERACTIVE PORTFOLIO", "The Data Foundry",
      ["Watch a data pipeline run in 3D. Break it", "on purpose and see how it recovers."],
      ["Next.js", "Three.js", "live event stream"], GOLD, foundry_motif, "OPEN THE FOUNDRY")
-card("dhaba", "LIVE · DATADHABA.IN", "Data Dhaba",
-     ["A data engineering school I run: handbooks,", "SQL and Python labs, a 24-week path."],
-     ["learn", "build", "get hired"], "#e8366f", dhaba_motif, "START LEARNING")
 card("passport", "OPEN SOURCE · ON PyPI", "Number Passport",
      ["Trace any reported number back to its", "source rows, reconcile every hop, prove it."],
      ["Python", "lineage", "BCBS 239", "MCP"], "#7cc4ff", passport_motif, "VIEW REPO")
