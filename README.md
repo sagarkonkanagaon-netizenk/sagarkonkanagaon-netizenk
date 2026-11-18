@@ -4,7 +4,6 @@
 
 <p align="center">
   <a href="https://data-foundry-sand.vercel.app"><b>The Data Foundry</b></a> ·
-  <a href="https://datadhaba.in"><b>Data Dhaba</b></a> ·
   <a href="https://www.linkedin.com/in/sagar-konkanagaon-346914156"><b>LinkedIn</b></a> ·
   <a href="mailto:sagarkonkanagaon@gmail.com"><b>Email</b></a>
 </p>
@@ -20,7 +19,6 @@ Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-comme
 
 <p align="center">
   <a href="https://data-foundry-sand.vercel.app"><img src="assets/card-foundry.svg" width="49%" alt="The Data Foundry: watch a data pipeline run in 3D, break it on purpose and see how it recovers"></a>
-  <a href="https://datadhaba.in"><img src="assets/card-dhaba.svg" width="49%" alt="Data Dhaba: a data engineering school with handbooks, SQL and Python labs and a 24-week path"></a>
   <a href="https://github.com/sagarkonkanagaon-netizenk/number-passport"><img src="assets/card-passport.svg" width="49%" alt="Number Passport: trace any reported number back to its source rows and prove it"></a>
   <a href="https://github.com/sagarkonkanagaon-netizenk/deja"><img src="assets/card-deja.svg" width="49%" alt="deja: memory for Claude Code and Codex that never debugs the same bug twice"></a>
 </p>
@@ -103,6 +101,5 @@ Five years of Spark, Databricks, Delta Lake, Airflow and BigQuery across e-comme
 <p align="center">
   <a href="https://www.linkedin.com/in/sagar-konkanagaon-346914156">LinkedIn</a> ·
   <a href="mailto:sagarkonkanagaon@gmail.com">sagarkonkanagaon@gmail.com</a> ·
-  <a href="https://data-foundry-sand.vercel.app">data-foundry-sand.vercel.app</a> ·
-  <a href="https://datadhaba.in">datadhaba.in</a>
+  <a href="https://data-foundry-sand.vercel.app">data-foundry-sand.vercel.app</a>
 </p>
